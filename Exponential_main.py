@@ -53,29 +53,33 @@ def evaluate_model(seed_value):
     print(f"Average reward for seed {seed_value}: {total_reward / max(1, num_episodes)}")
     env.close()
 
+
 def train_env(seed_value, train=True, fps=30):
     if train:
         print(f"Starting training with seed {seed_value}")
         env = ExpoLegEnv(render_mode=None)
         env.seed(seed_value)
-        
+
         model = PPO(
             'MlpPolicy', env, verbose=1, seed=seed_value,
             tensorboard_log=f"./tensorboard_log/{folder}/ppo_seed{seed_value}",
-            gamma=0.9, 
+            gamma=0.9,
             ent_coef=0.01,
-            learning_rate=linear_schedule(0.0003) )
-        
+            learning_rate=linear_schedule(0.0003)
+        )
+
         model.learn(total_timesteps=100_000)
 
-        model.save(f"./tensorboard_log/model//{folder}/PPO_seed_{seed_value}.model")
-        env.save_distances(f'./data//{folder}/distance/distance_history_seed_{seed_value}.npy')
-        if seed_value == 101:
-          #env.save_stiffness_history(f'./data/Exponential/stiffness/stiffness_history_seed_{seed_value}.npy')
-            env.save_stiffness_history(f'./data//{folder}/stiffness/stiffness_history_seed_{seed_value}.npy')
+        model.save(f"./tensorboard_log/model/{folder}/PPO_seed_{seed_value}.model")
+        env.save_distances(f'./data/{folder}/distance/distance_history_seed_{seed_value}.npy')
+
+        # ✅ Save stiffness history for every seed
+        env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history_seed_{seed_value}.npy')
+
         env.close()
     else:
         evaluate_model(seed_value)
+
 
 def main_parallel(num_runs, train=True):
     seeds = list(range(1, num_runs + 1))  # Generate seeds from 1 up to num_runs
