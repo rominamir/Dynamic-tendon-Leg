@@ -1,7 +1,7 @@
 import numpy as np
 from stable_baselines3 import PPO
 
-from Basde_Code import  ExpoLegEnv   #as DynamicLegEnv
+from Basde_Code import ExpoLegEnv  # as DynamicLegEnv
 import multiprocessing as mp
 from stable_baselines3.common.callbacks import BaseCallback
 from gymnasium.wrappers import RecordVideo
@@ -12,7 +12,8 @@ from datetime import datetime
 current_date = datetime.now()
 # Format the date as "Dec9"
 current_date = current_date.strftime("%b%d")
-folder = 'Exponential_10k_jan14' 
+folder = 'Exponential_10k_jan14'
+
 
 class CustomCallback(BaseCallback):
     def _on_step(self) -> bool:
@@ -24,10 +25,13 @@ class CustomCallback(BaseCallback):
     def _on_rollout_start(self) -> None:
         self.model.save(f"PPO.model")
 
+
 def linear_schedule(initial_value):
     def func(progress_remaining):
         return progress_remaining * initial_value
+
     return func
+
 
 def evaluate_model(seed_value):
     print(f"Starting evaluation with seed {seed_value}")
@@ -65,17 +69,15 @@ def train_env(seed_value, train=True, fps=30):
             tensorboard_log=f"./tensorboard_log/{folder}/ppo_seed{seed_value}",
             gamma=0.9,
             ent_coef=0.01,
-            learning_rate=linear_schedule(0.0003)
-        )
+            learning_rate=linear_schedule(0.0003))
 
         model.learn(total_timesteps=100_000)
 
-        model.save(f"./tensorboard_log/model/{folder}/PPO_seed_{seed_value}.model")
-        env.save_distances(f'./data/{folder}/distance/distance_history_seed_{seed_value}.npy')
-
-        # ✅ Save stiffness history for every seed
-        env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history_seed_{seed_value}.npy')
-
+        model.save(f"./tensorboard_log/model//{folder}/PPO_seed_{seed_value}.model")
+        env.save_distances(f'./data//{folder}/distance/distance_history_seed_{seed_value}.npy')
+        if seed_value == 101:
+            # env.save_stiffness_history(f'./data/Exponential/stiffness/stiffness_history_seed_{seed_value}.npy')
+            env.save_stiffness_history(f'./data//{folder}/stiffness/stiffness_history_seed_{seed_value}.npy')
         env.close()
     else:
         evaluate_model(seed_value)
@@ -87,10 +89,9 @@ def main_parallel(num_runs, train=True):
         pool.starmap(train_env, [(seed, train) for seed in seeds])
 
 
-if __name__ == '__main__':   
-
+if __name__ == '__main__':
     print("this is an Exponential functin run")
-    #num_runs = int(input("Enter the number of parallel runs: "))
-    #train = input("Enter 'train' or 'eval' for mode: ")
-    #main_parallel(num_runs, train=train)
+    # num_runs = int(input("Enter the number of parallel runs: "))
+    # train = input("Enter 'train' or 'eval' for mode: ")
+    # main_parallel(num_runs, train=train)
     train_env(101, True)
