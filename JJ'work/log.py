@@ -125,3 +125,17 @@ class LogLegEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         Saves the history of stiffness values to a file.
         """
         np.save(filename, np.array(self.stiffness_history))
+    def save_distances(self, filename):
+       # Construct a clean path
+        filename = os.path.normpath(filename)
+        directory = os.path.dirname(filename)
+        os.makedirs(directory, exist_ok=True)  # Ensure the directory exists
+
+        np.save(filename, self.distances)
+
+    def load_distances(self, filename):
+        self.distances = np.load(filename).tolist()
+
+    def get_position(self):
+    # Assuming the first element of qpos represents the x-position
+        return self.data.qpos[0]
