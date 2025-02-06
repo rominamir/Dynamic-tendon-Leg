@@ -43,6 +43,7 @@ def evaluate_model(seed_value, growth_factor=0.01):
     print(f"Starting evaluation with seed {seed_value} and growth_factor {growth_factor}")
 
     env = ExpoLegEnv(render_mode="rgb_array", growth_factor=growth_factor)  # Adjustable growth factor
+
     env = RecordVideo(
         env,
         video_folder=f"./videos/seed_{seed_value}/",

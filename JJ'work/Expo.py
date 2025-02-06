@@ -1,10 +1,14 @@
-import numpy as np
-import gym
-import mujoco
-from gymnasium.envs.mujoco import MujocoEnv
-from gym import utils
+import os
+#import gymnasium as gym
 
-class ExpoLegEnv(MujocoEnv, utils.EzPickle):
+import mujoco
+import numpy as np
+from gym import utils, error
+import gym
+import mujoco_env
+from math import exp
+
+class ExpoLegEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
 
     def __init__(self, xml_file='leg.xml', render_mode='none', seed=None,
@@ -25,7 +29,7 @@ class ExpoLegEnv(MujocoEnv, utils.EzPickle):
         observation_space = gym.spaces.Box(low=-10, high=10, shape=(6,), dtype=np.float32)
 
         utils.EzPickle.__init__(self)
-        MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=observation_space)
+        mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=observation_space)
 
         if seed is not None:
             self.seed(seed)
