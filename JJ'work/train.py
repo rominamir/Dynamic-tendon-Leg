@@ -7,7 +7,7 @@ def run_multiple_schedulers_in_series():
     Run training with different stiffness growth strategies and RL algorithms in series.
 
     This function iterates through predefined scheduler configurations, each specifying:
-    - growth_type: The type of stiffness progression (e.g., 'exponential', 'linear').
+    - growth_type: The type of stiffness progression (e.g., 'exponential', 'linear', 'logarithmic', 'constant').
     - growth_factor: The factor controlling the rate of stiffness change.
     - algorithm: The reinforcement learning algorithm to use ('PPO' or 'A2C').
 
