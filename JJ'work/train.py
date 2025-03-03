@@ -4,38 +4,27 @@ from env import train_env
 
 def run_multiple_schedulers_in_series():
     """
-    Run the training multiple times in series,
-    each with a distinct combination of growth_type and growth_factor.
+    Run training with different stiffness growth strategies and RL algorithms in series.
+
+    This function iterates through predefined scheduler configurations, each specifying:
+    - growth_type: The type of stiffness progression (e.g., 'exponential', 'linear').
+    - growth_factor: The factor controlling the rate of stiffness change.
+    - algorithm: The reinforcement learning algorithm to use ('PPO' or 'A2C').
+
+    It sets a fixed random seed for reproducibility and calls `train_env` for each configuration.
     """
 
-    # Example configurations:
-    # 1) exponential with growth_factor=0.05
-    # 2) linear with growth_factor=5
-    # 3) logarithmic with growth_factor=5
-    # 4) constant with growth_factor=5
-    # scheduler_configs = [
-    #     {"growth_type": "exponential", "growth_factor": 0.05},
-    #     {"growth_type": "logarithmic", "growth_factor": 5},
-    #     {"growth_type": "linear", "growth_factor": 5},
-    #     {"growth_type": "constant", "growth_factor": 5}
-    # ]
-    scheduler_configs = [{"growth_type": "exponential", "growth_factor": 5}]
-    seed_value = 101  # You can change or vary this if desired
+    scheduler_configs = [{"growth_type": "exponential", "growth_factor": 5, "algorithm": "A2C"}]
+    seed_value = 101  # Set a fixed seed for consistency
 
     for config in scheduler_configs:
-        g_type = config["growth_type"]
-        g_factor = config["growth_factor"]
-        print(f"Running training with growth_type={g_type}, growth_factor={g_factor}")
-        # Call your environment training function
         train_env(
             seed_value=seed_value,
-            train=True,
-            growth_factor=g_factor,
-            growth_type=g_type
+            algorithm=config["algorithm"],
+            growth_factor=config["growth_factor"],
+            growth_type=config["growth_type"]
         )
-        print(f"Finished training for {g_type} with factor={g_factor}\n")
-
 
 if __name__ == '__main__':
-    # This will sequentially run train_env for each config
+    # Execute the function to run training for each scheduler configuration
     run_multiple_schedulers_in_series()
