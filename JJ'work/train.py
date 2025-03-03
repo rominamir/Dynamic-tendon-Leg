@@ -8,7 +8,8 @@ def run_multiple_schedulers_in_series():
 
     This function iterates through predefined scheduler configurations, each specifying:
     - growth_type: The type of stiffness progression (e.g., 'exponential', 'linear', 'logarithmic', 'constant').
-    - growth_factor: The factor controlling the rate of stiffness change.
+    - growth_factor: The factor controlling the rate of stiffness change (by default, it is suggested to set exponential at 0.05 and logarithmic at 5, 
+    there is no affect on constant and linear).
     - algorithm: The reinforcement learning algorithm to use ('PPO' or 'A2C').
 
     It sets a fixed random seed for reproducibility and calls `train_env` for each configuration.
