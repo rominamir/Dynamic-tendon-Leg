@@ -63,7 +63,7 @@ class StiffnessUpdater:
 num_timesteps = 200
 stiffness_start = 2000
 stiffness_end = 20000
-growth_factor = 3  # 影响指数和对数增长的速率
+growth_factor = 3
 
 # 创建对象并可视化
 updater = StiffnessUpdater(num_timesteps, stiffness_start, stiffness_end, growth_factor)
