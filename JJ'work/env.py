@@ -56,33 +56,43 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.stiffness_history = []
         self.distances = []
 
-    def update_stiffness(self, global_step, growth_type):
+    def update_stiffness(self, global_step):
+        """
+        Updates the tendon stiffness based on the global_step.
+
+        :param global_step: The total number of steps taken across all training episodes.
+        """
         progress = global_step / max(1, self.num_timesteps)
 
-        if growth_type == 'exponential':
-            stiffness_scaling = self.stiffness_start + (
-                    (self.stiffness_end - self.stiffness_start) *
-                    (np.exp(self.growth_factor * progress) - 1) /
-                    (np.exp(self.growth_factor) - 1)
+        if self.growth_type == 'exponential':
+            # Exponential growth
+            exponent = self.growth_factor * progress
+            self.stiffness_scaling = self.stiffness_start + (
+                (self.stiffness_end - self.stiffness_start)
+                * (np.exp(exponent) - 1)
+                / (np.exp(self.growth_factor) - 1)
             )
-        elif growth_type == 'logarithmic':
-            adjusted_progress = (1 - np.exp(-self.growth_factor * progress)) / (1 - np.exp(-self.growth_factor))
-            stiffness_scaling = self.stiffness_start + (
-                    (self.stiffness_end - self.stiffness_start) * adjusted_progress
+        elif self.growth_type == 'logarithmic':
+            # Logarithmic growth
+            adjusted_progress = 1 - np.exp(-self.growth_factor * progress)
+            self.stiffness_scaling = self.stiffness_start + (
+                (self.stiffness_end - self.stiffness_start) * adjusted_progress
             )
-
-
-        elif growth_type == 'linear':
-            stiffness_scaling = self.stiffness_start + (
-                    progress * (self.stiffness_end - self.stiffness_start)
+        elif self.growth_type == 'linear':
+            # Linear growth
+            self.stiffness_scaling = self.stiffness_start + (
+                progress * (self.stiffness_end - self.stiffness_start)
             )
-        elif growth_type == 'constant':
-            stiffness_scaling = self.stiffness_start
-        else:
-            raise ValueError("Invalid growth_type. Choose from ['exponential', 'logarithmic', 'linear', 'constant'].")
+        elif self.growth_type == 'constant':
+            # No change in stiffness
+            self.stiffness_scaling = self.stiffness_start
 
-        stiffness_scaling = min(stiffness_scaling, self.stiffness_end)
-        self.stiffness_history.append(stiffness_scaling)
+        # Ensure it does not exceed the final stiffness
+        self.stiffness_scaling = min(self.stiffness_scaling, self.stiffness_end)
+
+        # Apply the updated stiffness and record its value
+        self.apply_stiffness(self.stiffness_scaling)
+        self.stiffness_history.append(self.stiffness_scaling)
 
     def step(self, action):
         x_position_before = self.data.qpos[0]
