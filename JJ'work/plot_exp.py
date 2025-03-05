@@ -18,13 +18,13 @@ def exponential_stiffness_growth(stiffness_start, stiffness_end, total_episodes,
     episodes = np.arange(total_episodes)
     exponent = growth_factor * episodes
     stiffness_values = stiffness_start + (
-        (stiffness_end - stiffness_start) * (np.exp(exponent) - 1) / (np.exp(growth_factor * total_episodes) - 1)
+        (stiffness_end - stiffness_start) * (1 - np.exp(exponent))
     )
     return episodes, stiffness_values
 
 # Parameters
-stiffness_start = 1000
-stiffness_end = 10000
+stiffness_start = 2000
+stiffness_end = 20000
 total_episodes = 100
 growth_factors = [0.005, 0.01, 0.02, 0.05]  # Different growth factors for comparison
 

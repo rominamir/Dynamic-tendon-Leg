@@ -2,30 +2,38 @@ import os
 from datetime import datetime
 from env import train_env
 
-def run_multiple_schedulers_in_series():
+
+def run_training_with_multiple_seeds():
     """
-    Run training with different stiffness growth strategies and RL algorithms in series.
+    Run training for a single growth strategy with 20 different random seeds.
 
-    This function iterates through predefined scheduler configurations, each specifying:
-    - growth_type: The type of stiffness progression (e.g., 'exponential', 'linear', 'logarithmic', 'constant').
-    - growth_factor: The factor controlling the rate of stiffness change (by default, it is suggested to set exponential at 0.05 and logarithmic at 5, 
-    there is no affect on constant and linear).
-    - algorithm: The reinforcement learning algorithm to use ('PPO' or 'A2C').
+    This function configures:
+    - `growth_type`: The type of stiffness progression (e.g., 'exponential', 'linear', 'logarithmic', 'constant').
+    - `growth_factor`: The factor controlling the rate of stiffness change (set to 0.05 for exponential, 5 for logarithmic).
+    - `algorithm`: The reinforcement learning algorithm to use ('PPO' or 'A2C').
+    - `num_seeds`: The number of different seeds for training (default: 20).
 
-    It sets a fixed random seed for reproducibility and calls `train_env` for each configuration.
+    It iterates through 20 different seeds and calls `train_env` for each.
     """
 
-    scheduler_configs = [{"growth_type": "exponential", "growth_factor": 5, "algorithm": "A2C"}]
-    seed_value = 101  # Set a fixed seed for consistency
+    growth_type = "exponential"  # Change this to "linear", "logarithmic", or "constant" as needed
+    growth_factor = 3.0
+    algorithm = "PPO"  # Change to "A2C" if needed
+    num_seeds = 20  # Run training with 20 different random seeds
 
-    for config in scheduler_configs:
+    for i in range(num_seeds):
+        seed_value = 100 + i  # Generate different seed values
+
+        print(f"Starting training for seed {seed_value} using {growth_type} growth with {algorithm}")
+
         train_env(
             seed_value=seed_value,
-            algorithm=config["algorithm"],
-            growth_factor=config["growth_factor"],
-            growth_type=config["growth_type"]
+            algorithm=algorithm,
+            growth_factor=growth_factor,
+            growth_type=growth_type
         )
 
+
 if __name__ == '__main__':
-    # Execute the function to run training for each scheduler configuration
-    run_multiple_schedulers_in_series()
+    # Execute the function to run training with different seeds
+    run_training_with_multiple_seeds()

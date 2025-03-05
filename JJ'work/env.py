@@ -20,11 +20,11 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         xml_file='leg.xml',
         render_mode='none',
         seed=None,
-        stiffness_start=1000,
+        stiffness_start=2000,
         stiffness_end=20000,
         num_timesteps=100_000,
         max_episode_steps=500,
-        growth_factor=5,
+        growth_factor=0.03,
         growth_type='exponential'
     ):
         self.action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
@@ -56,32 +56,33 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.stiffness_history = []
         self.distances = []
 
-    def update_stiffness(self, global_step):
+    def update_stiffness(self, global_step, growth_type):
         progress = global_step / max(1, self.num_timesteps)
 
-        if self.growth_type == 'exponential':
-            exponent = self.growth_factor * progress
-            self.stiffness_scaling = self.stiffness_start + (
-                (self.stiffness_end - self.stiffness_start)
-                * (np.exp(exponent) - 1)
-                / (np.exp(self.growth_factor) - 1)
+        if growth_type == 'exponential':
+            stiffness_scaling = self.stiffness_start + (
+                    (self.stiffness_end - self.stiffness_start) *
+                    (np.exp(self.growth_factor * progress) - 1) /
+                    (np.exp(self.growth_factor) - 1)
             )
-        elif self.growth_type == 'logarithmic':
-            adjusted_progress = 1 - np.exp(-self.growth_factor * progress)
-            self.stiffness_scaling = self.stiffness_start + (
-                (self.stiffness_end - self.stiffness_start) * adjusted_progress
+        elif growth_type == 'logarithmic':
+            adjusted_progress = (1 - np.exp(-self.growth_factor * progress)) / (1 - np.exp(-self.growth_factor))
+            stiffness_scaling = self.stiffness_start + (
+                    (self.stiffness_end - self.stiffness_start) * adjusted_progress
             )
-        elif self.growth_type == 'linear':
-            self.stiffness_scaling = self.stiffness_start + (
-                progress * (self.stiffness_end - self.stiffness_start)
-            )
-        elif self.growth_type == 'constant':
-            self.stiffness_scaling = self.stiffness_start
 
-        self.stiffness_scaling = min(self.stiffness_scaling, self.stiffness_end)
 
-        self.apply_stiffness(self.stiffness_scaling)
-        self.stiffness_history.append(self.stiffness_scaling)
+        elif growth_type == 'linear':
+            stiffness_scaling = self.stiffness_start + (
+                    progress * (self.stiffness_end - self.stiffness_start)
+            )
+        elif growth_type == 'constant':
+            stiffness_scaling = self.stiffness_start
+        else:
+            raise ValueError("Invalid growth_type. Choose from ['exponential', 'logarithmic', 'linear', 'constant'].")
+
+        stiffness_scaling = min(stiffness_scaling, self.stiffness_end)
+        self.stiffness_history.append(stiffness_scaling)
 
     def step(self, action):
         x_position_before = self.data.qpos[0]
@@ -130,7 +131,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.distances = np.load(filename).tolist()
 
 
-def train_env(seed_value, algorithm='PPO', growth_factor=0.05, growth_type='exponential'):
+def train_env(seed_value, algorithm='PPO', growth_factor=0.03, growth_type='exponential'):
     folder = f'LegEnv_{datetime.now().strftime("%b%d")}_{growth_type}_{algorithm}'
     os.makedirs(f"./tensorboard_log/{folder}/model/", exist_ok=True)
     os.makedirs(f"./data/{folder}/distance/", exist_ok=True)

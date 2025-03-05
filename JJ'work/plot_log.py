@@ -22,8 +22,8 @@ def logarithmic_stiffness_growth(stiffness_start, stiffness_end, total_episodes,
     return episodes, stiffness_values
 
 # Parameters
-stiffness_start = 1000
-stiffness_end = 10000
+stiffness_start = 2000
+stiffness_end = 20000
 total_episodes = 100
 growth_factors = [2, 5, 10, 15]  # Different growth factors for comparison
 
