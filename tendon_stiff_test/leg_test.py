@@ -1,3 +1,8 @@
+import mujoco
+import numpy as np
+
+# Paste your full MuJoCo XML string here
+model_xml = """
 <mujoco model="2-link 6-muscle arm">
     <!--  Copyright © 2018, Roboti LLC
 
@@ -110,3 +115,18 @@
         <muscle name="T_M2" tendon="T_M2"/>
     </actuator>
 </mujoco>
+"""
+
+# Load model
+model = mujoco.MjModel.from_xml_string(model_xml)
+data = mujoco.MjData(model)
+
+# Step the simulation once to compute tendon lengths
+mujoco.mj_step(model, data)
+
+# Get tendon names and lengths
+print("Tendon Lengths:")
+for i in range(model.ntendon):
+    name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_TENDON, i)
+    length = data.ten_length[i]
+    print(f"{name}: {length:.4f} m")
