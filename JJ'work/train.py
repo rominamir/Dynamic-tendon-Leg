@@ -16,7 +16,7 @@ def run_training_with_multiple_seeds():
     It iterates through 20 different seeds and calls `train_env` for each.
     """
 
-    growth_type = "constant"  # Options: "linear", "logarithmic", "constant"
+    growth_type = "linear"  # Options: "linear", "logarithmic", "constant"
     growth_factor = 3.0  # Keep it fixed as you prefer
     algorithm = "PPO"  # Options: "PPO", "A2C"
     num_seeds = 10  # Run training with 20 different random seeds

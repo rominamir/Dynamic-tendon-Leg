@@ -21,9 +21,9 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         xml_file='leg.xml',
         render_mode='none',
         seed=None,
-        stiffness_start=9000,
-        stiffness_end=11000,
-        num_epochs=400,
+        stiffness_start=250,
+        stiffness_end=2500,
+        num_epochs=200,
         max_episode_steps=500,
         growth_factor=0.03,
         growth_type='exponential',
@@ -86,7 +86,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
                 progress * (self.stiffness_end - self.stiffness_start)
             )
         elif self.growth_type == 'constant':
-            self.stiffness_scaling = 10000
+            self.stiffness_scaling = 2500
 
         self.stiffness_scaling = min(self.stiffness_scaling, self.stiffness_end)
         self.apply_stiffness(self.stiffness_scaling)
@@ -160,7 +160,7 @@ def train_env(seed_value, algorithm='PPO', growth_factor=0.03, growth_type='expo
     else:
         raise ValueError("Unsupported algorithm! Choose between 'PPO' and 'A2C'")
 
-    model.learn(total_timesteps=200_000)
+    model.learn(total_timesteps=100_000)
     model.save(f"./tensorboard_log/{folder}/model/{algorithm}_seed_{seed_value}_{growth_type}.model")
 
     env.save_distances(f'./data/{folder}/distance/distance_history_seed_{seed_value}.npy')
