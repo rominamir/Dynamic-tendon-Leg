@@ -85,8 +85,18 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.stiffness_scaling = self.stiffness_start + (
                 progress * (self.stiffness_end - self.stiffness_start)
             )
-        elif self.growth_type == 'constant':
+        elif self.growth_type == 'constant:200':
             self.stiffness_scaling = 200
+        elif self.growth_type == 'constant:1k':
+            self.stiffness_scaling = 1000
+        elif self.growth_type == 'constant:5k':
+            self.stiffness_scaling = 5000
+        elif self.growth_type == 'constant:10k':
+            self.stiffness_scaling = 10000
+        elif self.growth_type == 'constant:15k':
+            self.stiffness_scaling = 15000
+        elif self.growth_type == 'constant:20k':
+            self.stiffness_scaling = 20000
 
         elif self.growth_type == 'curriculum_linear':
             if progress <= 0.25:
@@ -123,7 +133,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
     def apply_stiffness(self, stiffness_value):
         for i in range(len(self.model.tendon_stiffness)):
             self.model.tendon_stiffness[i] = stiffness_value
-
+	print(f"[Apply] Updated tendon stiffness to: {stiffness_value}")
+	print(f"[Check] Tendon stiffness array: {self.model.tendon_stiffness}")
     def get_obs(self):
         return np.concatenate(
             (self.data.qpos.flat.copy(), self.data.qvel.flat.copy())
@@ -168,7 +179,7 @@ def train_env(seed_value, algorithm='PPO', growth_factor=0.03, growth_type='expo
     else:
         raise ValueError("Unsupported algorithm! Choose between 'PPO' and 'A2C'")
 
-    model.learn(total_timesteps=1000000)
+    model.learn(total_timesteps=100000)
     model.save(f"./tensorboard_log/{folder}/model/{algorithm}_seed_{seed_value}_{growth_type}.model")
 
     env.save_distances(f'./data/{folder}/distance/distance_history_seed_{seed_value}.npy')
