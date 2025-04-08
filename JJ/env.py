@@ -9,11 +9,6 @@ from stable_baselines3 import PPO, A2C
 from gymnasium.wrappers import RecordVideo
 
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
-    """
-    A custom leg environment based on MujocoEnv.
-    This environment updates tendon stiffness over time according to different growth strategies (e.g. exponential),
-    but only at the beginning of each epoch.
-    """
     metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
 
     def __init__(
@@ -22,7 +17,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         render_mode='none',
         seed=None,
         stiffness_start=200,
-        stiffness_end=5000,
+        stiffness_end=50000,
         num_epochs=1000,
         max_episode_steps=1000,
         growth_factor=0.03,
@@ -59,15 +54,12 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.stiffness_history = []
         self.distances = []
 
-        self.update_stiffness(self.epoch_counter)  # Initialize stiffness at the start
+        print(f"[Init] growth_type: {self.growth_type}")
+        self.update_stiffness(self.epoch_counter)
 
     def update_stiffness(self, epoch):
-        """
-        Updates the tendon stiffness based on the epoch number.
-
-        :param epoch: The current epoch number.
-        """
         progress = epoch / max(1, self.num_epochs)
+        print(f"[Update] Epoch {epoch} | Progress: {progress:.4f} | Type: {self.growth_type}")
 
         if self.growth_type == 'exponential':
             exponent = self.growth_factor * progress
@@ -97,15 +89,16 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.stiffness_scaling = 15000
         elif self.growth_type == 'constant:20k':
             self.stiffness_scaling = 20000
-
         elif self.growth_type == 'curriculum_linear':
             if progress <= 0.25:
                 self.stiffness_scaling = self.stiffness_start
             else:
                 lin_progress = (progress - 0.25) / 0.75
                 self.stiffness_scaling = self.stiffness_start + lin_progress * (
-                            self.stiffness_end - self.stiffness_start)
+                    self.stiffness_end - self.stiffness_start
+                )
 
+        print(f"[Update] Calculated stiffness: {self.stiffness_scaling}")
         self.stiffness_scaling = min(self.stiffness_scaling, self.stiffness_end)
         self.apply_stiffness(self.stiffness_scaling)
         self.stiffness_history.append(self.stiffness_scaling)
@@ -126,15 +119,17 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def reset_model(self):
         self.steps_from_reset = 0
-        self.epoch_counter += 1  # Update epoch count at the beginning of a new episode
-        self.update_stiffness(self.epoch_counter)  # Update stiffness per epoch
+        self.epoch_counter += 1
+        print(f"[Reset] Epoch {self.epoch_counter} starting...")
+        self.update_stiffness(self.epoch_counter)
         return self.get_obs()
 
     def apply_stiffness(self, stiffness_value):
         for i in range(len(self.model.tendon_stiffness)):
             self.model.tendon_stiffness[i] = stiffness_value
-	print(f"[Apply] Updated tendon stiffness to: {stiffness_value}")
-	print(f"[Check] Tendon stiffness array: {self.model.tendon_stiffness}")
+        print(f"[Apply] Updated tendon stiffness to: {stiffness_value}")
+        print(f"[Check] Tendon stiffness array: {self.model.tendon_stiffness}")
+
     def get_obs(self):
         return np.concatenate(
             (self.data.qpos.flat.copy(), self.data.qvel.flat.copy())
@@ -148,6 +143,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
     def save_stiffness_history(self, filename):
         os.makedirs(os.path.dirname(os.path.normpath(filename)), exist_ok=True)
         np.save(filename, np.array(self.stiffness_history))
+        print(f"[Save] Saved stiffness history with {len(self.stiffness_history)} entries to: {filename}")
 
     def save_distances(self, filename):
         os.makedirs(os.path.dirname(os.path.normpath(filename)), exist_ok=True)
@@ -155,7 +151,6 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def load_distances(self, filename):
         self.distances = np.load(filename).tolist()
-
 
 
 def train_env(seed_value, algorithm='PPO', growth_factor=0.03, growth_type='exponential'):
@@ -179,7 +174,7 @@ def train_env(seed_value, algorithm='PPO', growth_factor=0.03, growth_type='expo
     else:
         raise ValueError("Unsupported algorithm! Choose between 'PPO' and 'A2C'")
 
-    model.learn(total_timesteps=100000)
+    model.learn(total_timesteps=1000000)
     model.save(f"./tensorboard_log/{folder}/model/{algorithm}_seed_{seed_value}_{growth_type}.model")
 
     env.save_distances(f'./data/{folder}/distance/distance_history_seed_{seed_value}.npy')

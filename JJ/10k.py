@@ -12,7 +12,7 @@ def run_training_with_multiple_schedulers_and_seeds():
     ]
     growth_factor = 3.0  # You can adjust or ignore this for constant types
     algorithm = "PPO"
-    num_seeds = 1
+    num_seeds = 10
 
     for growth_type in growth_types:
         print(f"\n🌱 Starting training for growth_type = {growth_type}")
