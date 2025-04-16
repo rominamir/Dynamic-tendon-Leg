@@ -196,18 +196,25 @@ def train_env(seed_value, algorithm='PPO', growth_factor=0.03, growth_type='expo
     aggregate_training_rewards(folder, num_seeds=num_seeds)
 
 def run_training_with_multiple_seeds():
-    growth_type = "constant:5000"
+    growth_type = "linear"
     growth_factor = 3.0
     algorithm = "PPO"
     num_seeds = 10
-    stiffness_start = 20000
-    stiffness_end = 30000
+    stiffness_start = 30000
+    stiffness_end = 40000
 
-    folder = f'LegEnv_{datetime.now().strftime("%b%d")}_{growth_type}_{algorithm}"
     print(f"\n🚀 Starting {num_seeds} training runs with {growth_type} using {algorithm}")
     for i in range(num_seeds):
-        train_env(100 + i, algorithm, growth_factor, growth_type, num_seeds,
-                  stiffness_start=stiffness_start, stiffness_end=stiffness_end)
+        train_env(
+            seed_value=100 + i,
+            algorithm=algorithm,
+            growth_factor=growth_factor,
+            growth_type=growth_type,
+            num_seeds=num_seeds,
+            stiffness_start=stiffness_start,
+            stiffness_end=stiffness_end
+        )
+
 
 if __name__ == '__main__':
     run_training_with_multiple_seeds()

@@ -1,0 +1,12 @@
+==========================================
+SLURM_JOB_ID = 2092269
+SLURM_JOB_NODELIST = d14-04
+TMPDIR = /tmp/SLURM_2092269
+==========================================
+Traceback (most recent call last):
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/curriculum.py", line 4, in <module>
+    from env import train_env
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 206
+    folder = f'LegEnv_{datetime.now().strftime("%b%d")}_{growth_type}_{algorithm}"
+             ^
+SyntaxError: unterminated string literal (detected at line 206)
