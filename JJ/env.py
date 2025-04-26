@@ -7,6 +7,21 @@ import mujoco
 import mujoco_env
 from stable_baselines3 import PPO, A2C
 
+class LearningRateSchedule:
+    def __init__(self, schedule_type='constant', lr_start=3e-4, lr_end=1e-5, total_timesteps=1_000_000):
+        self.schedule_type = schedule_type
+        self.lr_start = lr_start
+        self.lr_end = lr_end
+        self.total_timesteps = total_timesteps
+
+    def __call__(self, progress_remaining):
+        if self.schedule_type == 'linear':
+            return self.lr_end + (self.lr_start - self.lr_end) * progress_remaining
+        elif self.schedule_type == 'constant':
+            return self.lr_start
+        else:
+            raise ValueError(f"Unsupported schedule type: {self.schedule_type}")
+
 class TrainingConfig:
     def __init__(self,
                  algorithm='PPO',
@@ -15,7 +30,10 @@ class TrainingConfig:
                  stiffness_start=30000,
                  stiffness_end=40000,
                  num_seeds=10,
-                 total_timesteps=1_000_000):
+                 total_timesteps=1_000_000,
+                 lr_schedule_type='constant',
+                 lr_start=5e-4,
+                 lr_end=1e-5):
         self.algorithm = algorithm
         self.growth_type = growth_type
         self.growth_factor = growth_factor
@@ -23,13 +41,28 @@ class TrainingConfig:
         self.stiffness_end = stiffness_end
         self.num_seeds = num_seeds
         self.total_timesteps = total_timesteps
+        self.lr_schedule_type = lr_schedule_type
+        self.lr_start = lr_start
+        self.lr_end = lr_end
 
     def format_k(self, x):
         return f"{int(x/1000)}k" if x % 1000 == 0 else str(x)
 
     def folder_name(self):
         stiffness_tag = f"{self.format_k(self.stiffness_start)}-{self.format_k(self.stiffness_end)}"
-        return f"LegEnv_{datetime.now().strftime('%b%d')}_{self.growth_type}_{stiffness_tag}_{self.algorithm}"
+        if self.lr_schedule_type == 'constant':
+            lr_tag = f"LR_{self.lr_schedule_type}_{self.lr_start:.0e}"
+        else:
+            lr_tag = f"LR_{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
+        return f"LegEnv_{datetime.now().strftime('%b%d')}_{self.growth_type}_{stiffness_tag}_{lr_tag}_{self.algorithm}"
+
+    def get_lr_schedule(self):
+        return LearningRateSchedule(
+            schedule_type=self.lr_schedule_type,
+            lr_start=self.lr_start,
+            lr_end=self.lr_end,
+            total_timesteps=self.total_timesteps
+        )
 
 def evaluate_model(model, env, num_episodes=10):
     distances = []
@@ -198,15 +231,21 @@ def train_env(seed_value, config: TrainingConfig):
                      stiffness_end=config.stiffness_end)
     env.seed(seed_value)
 
+    lr_schedule = config.get_lr_schedule()
+
     if config.algorithm == 'PPO':
-        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value, tensorboard_log=f"./tensorboard_log/{folder}/ppo")
+        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value, 
+                    tensorboard_log=f"./tensorboard_log/{folder}/ppo",
+                    learning_rate=lr_schedule)
     elif config.algorithm == 'A2C':
-        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value, tensorboard_log=f"./tensorboard_log/{folder}/a2c")
+        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value, 
+                    tensorboard_log=f"./tensorboard_log/{folder}/a2c",
+                    learning_rate=lr_schedule)
     else:
         raise ValueError("Unsupported algorithm! Choose between 'PPO' and 'A2C'")
 
     model.learn(total_timesteps=config.total_timesteps)
-    model.save(f"./tensorboard_log/{folder}/model/{config.algorithm}_seed_{seed_value}_{config.growth_type}.model")
+    model.save(f"./tensorboard_log/{folder}/model/{config.algorithm}_seed_{seed_value}_{config.growth_type}_{config.lr_schedule_type}.model")
 
     env.save_reward_and_displacement(folder, seed_value)
     env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history.npy')
@@ -224,7 +263,10 @@ def run_training_with_multiple_seeds():
         growth_factor=3.0,
         stiffness_start=20000,
         stiffness_end=30000,
-        num_seeds=10
+        num_seeds=10,
+        lr_schedule_type='linear',
+        lr_start=3e-4,
+        lr_end=1e-5
     )
 
     print(f"\n\U0001f680 Starting {config.num_seeds} training runs with {config.growth_type} using {config.algorithm}")
