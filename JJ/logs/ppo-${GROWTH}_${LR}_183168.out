@@ -1,0 +1,7 @@
+==========================================
+SLURM_JOB_ID = 183168
+SLURM_JOB_NODELIST = d14-05
+TMPDIR = /tmp/SLURM_183168
+==========================================
+2025-04-25 17:49:29.355367: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.

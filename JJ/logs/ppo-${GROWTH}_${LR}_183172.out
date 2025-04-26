@@ -1,0 +1,68 @@
+==========================================
+SLURM_JOB_ID = 183172
+SLURM_JOB_NODELIST = d23-10
+TMPDIR = /tmp/SLURM_183172
+==========================================
+2025-04-25 17:49:28.932949: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+🚀 Training | Seed=100 | Growth=constant:30k | LR=constant
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_log/LegEnv_Apr25_constant:30k_30k-40k_LR_constant_3e-04_PPO/ppo/PPO_1
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | -562     |
+| time/              |          |
+|    fps             | 1696     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | -401        |
+| time/                   |             |
+|    fps                  | 1207        |
+|    iterations           | 2           |
+|    time_elapsed         | 3           |
+|    total_timesteps      | 4096        |
+| train/                  |             |
+|    approx_kl            | 0.010589262 |
+|    clip_fraction        | 0.107       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | 0.00284     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 13.7        |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.00942    |
+|    std                  | 0.996       |
+|    value_loss           | 79.7        |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | -199         |
+| time/                   |              |
+|    fps                  | 1099         |
+|    iterations           | 3            |
+|    time_elapsed         | 5            |
+|    total_timesteps      | 6144         |
+| train/                  |              |
+|    approx_kl            | 0.0042824196 |
+|    clip_fraction        | 0.0364       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.22        |
+|    explained_variance   | 0.165        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 27.3         |
+|    n_updates            | 20           |
+|    policy_gradient_loss | -0.00706     |
+|    std                  | 0.984        |
+|    value_loss           | 78.7         |
+------------------------------------------

@@ -31,7 +31,7 @@ class TrainingConfig:
                  stiffness_end=40000,
                  num_seeds=10,
                  total_timesteps=1_000_000,
-                 lr_schedule_type='constant',
+                 lr_schedule_type='linear',
                  lr_start=5e-4,
                  lr_end=1e-5):
         self.algorithm = algorithm
@@ -269,9 +269,14 @@ def run_training_with_multiple_seeds():
         lr_end=1e-5
     )
 
-    print(f"\n\U0001f680 Starting {config.num_seeds} training runs with {config.growth_type} using {config.algorithm}")
+    print(f"\n🚀 Starting {config.num_seeds} training runs with {config.growth_type} using {config.algorithm}")
     for i in range(config.num_seeds):
-        train_env(seed_value=100 + i, config=config)
+        print(f"🔹 Training run {i+1}/{config.num_seeds} | Seed: {100+i} | Growth Type: {config.growth_type}")
+        try:
+            train_env(seed_value=100+i, config=config)
+        except Exception as e:
+            print(f"❌ Training failed due to error: {e}")
+
 
 if __name__ == '__main__':
     run_training_with_multiple_seeds()

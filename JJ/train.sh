@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=ppo-gpu
+#SBATCH --job-name=ppo-${GROWTH}_${LR}
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
@@ -13,4 +13,9 @@ eval "$(conda shell.bash hook)"
 conda activate lab
 
 cd /home1/jiajinzh/Dynamic-tendon-Leg/JJ/
-python linear.py
+
+# Read variables passed in
+GROWTH_TYPE=$1
+LR_SCHEDULE_TYPE=$2
+
+python train.py --growth_type ${GROWTH_TYPE} --lr_schedule_type ${LR_SCHEDULE_TYPE} --seed_start 100 --seed_end 109
