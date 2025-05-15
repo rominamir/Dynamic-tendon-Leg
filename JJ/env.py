@@ -51,9 +51,9 @@ class TrainingConfig:
     def folder_name(self):
         stiffness_tag = f"{self.format_k(self.stiffness_start)}-{self.format_k(self.stiffness_end)}"
         if self.lr_schedule_type == 'constant':
-            lr_tag = f"LR_{self.lr_schedule_type}_{self.lr_start:.0e}"
+            lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}"
         else:
-            lr_tag = f"LR_{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
+            lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
         return f"LegEnv_{datetime.now().strftime('%b%d')}_{self.growth_type}_{stiffness_tag}_{lr_tag}_{self.algorithm}"
 
     def get_lr_schedule(self):
@@ -63,6 +63,15 @@ class TrainingConfig:
             lr_end=self.lr_end,
             total_timesteps=self.total_timesteps
         )
+
+    def result_filename(self):
+        """ Generate consistent filename for saving aggregated npy """
+        stiffness_tag = f"{self.format_k(self.stiffness_start)}-{self.format_k(self.stiffness_end)}"
+        if self.lr_schedule_type == 'constant':
+            lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}"
+        else:
+            lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
+        return f"{self.growth_type}_stiffness_{stiffness_tag}_lr_{lr_tag}.npy"
 
 def evaluate_model(model, env, num_episodes=10):
     distances = []
@@ -76,39 +85,6 @@ def evaluate_model(model, env, num_episodes=10):
         x_end = env.get_position()
         distances.append(x_end - x_start)
     return np.mean(distances)
-
-def aggregate_eval_distances(folder, num_seeds=10):
-    eval_distances = []
-    for i in range(num_seeds):
-        path = f'./data/{folder}/distance/eval_distance_seed_{100 + i}.npy'
-        if os.path.exists(path):
-            eval_distances.append(np.load(path))
-    if len(eval_distances) >= 2:
-        overall_avg = np.mean(eval_distances)
-        np.save(f'./data/{folder}/distance/eval_distance_ALL.npy', overall_avg)
-        print(f"\u2705 Updated overall average eval distance over {len(eval_distances)} seeds: {overall_avg:.4f}")
-    else:
-        print("\u26a0\ufe0f Not enough evaluation files to compute overall average.")
-
-def aggregate_training_rewards(folder, num_seeds=10):
-    rewards, displacements = [], []
-    for i in range(num_seeds):
-        r_path = f'./data/{folder}/distance/reward_history_seed_{100 + i}.npy'
-        d_path = f'./data/{folder}/distance/displacement_history_seed_{100 + i}.npy'
-        if os.path.exists(r_path):
-            rewards.append(np.load(r_path))
-        if os.path.exists(d_path):
-            displacements.append(np.load(d_path))
-    if rewards:
-        min_len = min(len(r) for r in rewards)
-        reward_mean = np.mean([r[:min_len] for r in rewards], axis=0)
-        np.save(f'./data/{folder}/distance/reward_history_ALL.npy', reward_mean)
-        print(f"\u2705 Saved avg reward curve over {len(rewards)} seeds.")
-    if displacements:
-        min_len = min(len(d) for d in displacements)
-        disp_mean = np.mean([d[:min_len] for d in displacements], axis=0)
-        np.save(f'./data/{folder}/distance/displacement_history_ALL.npy', disp_mean)
-        print(f"\u2705 Saved avg displacement curve over {len(displacements)} seeds.")
 
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
     metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
@@ -217,6 +193,23 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         np.save(filename, np.array(self.stiffness_history))
 
+def aggregate_and_save_results(config: TrainingConfig):
+    folder = config.folder_name()
+    filename = config.result_filename()
+
+    rewards = []
+    for i in range(config.num_seeds):
+        r_path = f'./data/{folder}/distance/reward_history_seed_{100 + i}.npy'
+        if os.path.exists(r_path):
+            rewards.append(np.load(r_path))
+    if rewards:
+        min_len = min(len(r) for r in rewards)
+        reward_mean = np.mean([r[:min_len] for r in rewards], axis=0)
+        save_dir = f'./data/aggregated_results/rewards/'
+        os.makedirs(save_dir, exist_ok=True)
+        np.save(os.path.join(save_dir, filename), reward_mean)
+        print(f"✅ Saved aggregated reward curve at {save_dir}{filename}")
+
 def train_env(seed_value, config: TrainingConfig):
     folder = config.folder_name()
 
@@ -234,11 +227,11 @@ def train_env(seed_value, config: TrainingConfig):
     lr_schedule = config.get_lr_schedule()
 
     if config.algorithm == 'PPO':
-        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value, 
+        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/ppo",
                     learning_rate=lr_schedule)
     elif config.algorithm == 'A2C':
-        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value, 
+        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/a2c",
                     learning_rate=lr_schedule)
     else:
@@ -249,34 +242,9 @@ def train_env(seed_value, config: TrainingConfig):
 
     env.save_reward_and_displacement(folder, seed_value)
     env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history.npy')
+
     avg_eval_distance = evaluate_model(model, env, num_episodes=10)
     np.save(f'./data/{folder}/distance/eval_distance_seed_{seed_value}.npy', np.array(avg_eval_distance))
     env.close()
 
-    aggregate_eval_distances(folder, num_seeds=config.num_seeds)
-    aggregate_training_rewards(folder, num_seeds=config.num_seeds)
-
-def run_training_with_multiple_seeds():
-    config = TrainingConfig(
-        algorithm="PPO",
-        growth_type="linear",
-        growth_factor=3.0,
-        stiffness_start=20000,
-        stiffness_end=30000,
-        num_seeds=10,
-        lr_schedule_type='linear',
-        lr_start=3e-4,
-        lr_end=1e-5
-    )
-
-    print(f"\n🚀 Starting {config.num_seeds} training runs with {config.growth_type} using {config.algorithm}")
-    for i in range(config.num_seeds):
-        print(f"🔹 Training run {i+1}/{config.num_seeds} | Seed: {100+i} | Growth Type: {config.growth_type}")
-        try:
-            train_env(seed_value=100+i, config=config)
-        except Exception as e:
-            print(f"❌ Training failed due to error: {e}")
-
-
-if __name__ == '__main__':
-    run_training_with_multiple_seeds()
+    aggregate_and_save_results(config)

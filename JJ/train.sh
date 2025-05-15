@@ -7,6 +7,8 @@
 #SBATCH --mem=16G
 #SBATCH --time=24:00:00
 #SBATCH --output=logs/%x_%j.out
+#SBATCH --begin=now+30minutes
+
 
 module purge
 eval "$(conda shell.bash hook)"

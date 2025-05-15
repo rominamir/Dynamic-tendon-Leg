@@ -20,7 +20,7 @@ def main():
             stiffness_end=40000,
             num_seeds=(args.seed_end - args.seed_start + 1),
             lr_schedule_type=args.lr_schedule_type,
-            lr_start=3e-4,
+            lr_start=5e-4,
             lr_end=1e-5
         )
 
