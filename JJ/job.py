@@ -1,7 +1,7 @@
 import subprocess
 
-growth_types = ["linear", "curriculum_linear", "constant:30k", "constant:40k"]
-lr_schedule_types = ["constant", "linear"]
+growth_types = [f"constant:{k}k" for k in range(5, 51, 5)]
+lr_schedule_types = ["constant"]
 
 def submit_all_jobs():
     for growth in growth_types:
