@@ -6,7 +6,9 @@ from gym import utils
 import mujoco
 import mujoco_env
 from stable_baselines3 import PPO, A2C
+from stable_baselines3.common.vec_env import SubprocVecEnv
 
+# Learning rate scheduler
 class LearningRateSchedule:
     def __init__(self, schedule_type='constant', lr_start=3e-4, lr_end=1e-5, total_timesteps=1_000_000):
         self.schedule_type = schedule_type
@@ -22,6 +24,7 @@ class LearningRateSchedule:
         else:
             raise ValueError(f"Unsupported schedule type: {self.schedule_type}")
 
+# Configuration for training
 class TrainingConfig:
     def __init__(self,
                  algorithm='PPO',
@@ -33,7 +36,8 @@ class TrainingConfig:
                  total_timesteps=1_000_000,
                  lr_schedule_type='linear',
                  lr_start=5e-4,
-                 lr_end=1e-5):
+                 lr_end=1e-5,
+                 n_envs=4):  # Added n_envs for parallel environments
         self.algorithm = algorithm
         self.growth_type = growth_type
         self.growth_factor = growth_factor
@@ -44,6 +48,7 @@ class TrainingConfig:
         self.lr_schedule_type = lr_schedule_type
         self.lr_start = lr_start
         self.lr_end = lr_end
+        self.n_envs = n_envs
 
     def format_k(self, x):
         return f"{int(x/1000)}k" if x % 1000 == 0 else str(x)
@@ -66,6 +71,7 @@ class TrainingConfig:
             total_timesteps=self.total_timesteps
         )
 
+# Custom environment
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
     metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
 
@@ -173,6 +179,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         np.save(filename, np.array(self.stiffness_history))
 
+# Model evaluation
 def evaluate_model(model, env, num_episodes=10):
     distances = []
     for _ in range(num_episodes):
@@ -186,6 +193,7 @@ def evaluate_model(model, env, num_episodes=10):
         distances.append(x_end - x_start)
     return np.mean(distances)
 
+# Aggregate results for multiple seeds
 def aggregate_and_save_results(config: TrainingConfig):
     folder = config.folder_name()
     rewards, displacements = [], []
@@ -207,7 +215,7 @@ def aggregate_and_save_results(config: TrainingConfig):
         reward_se = np.std(rewards_trimmed, axis=0, ddof=1) / np.sqrt(len(rewards))
         np.save(os.path.join(save_dir, 'reward_mean.npy'), reward_mean)
         np.save(os.path.join(save_dir, 'reward_se.npy'), reward_se)
-        print(f"✅ Saved aggregated reward mean and SE at {save_dir}")
+        print(f"Saved aggregated reward mean and SE at {save_dir}")
 
     if displacements:
         min_len = min(len(d) for d in displacements)
@@ -216,27 +224,37 @@ def aggregate_and_save_results(config: TrainingConfig):
         displacement_se = np.std(displacements_trimmed, axis=0, ddof=1) / np.sqrt(len(displacements))
         np.save(os.path.join(save_dir, 'displacement_mean.npy'), displacement_mean)
         np.save(os.path.join(save_dir, 'displacement_se.npy'), displacement_se)
-        print(f"✅ Saved aggregated displacement mean and SE at {save_dir}")
+        print(f"Saved aggregated displacement mean and SE at {save_dir}")
 
+# Factory function for parallel environment creation
+def make_env(seed_offset, config, seed_value):
+    def _init():
+        env = LegEnvBase(render_mode=None,
+                         growth_factor=config.growth_factor,
+                         growth_type=config.growth_type,
+                         stiffness_start=config.stiffness_start,
+                         stiffness_end=config.stiffness_end)
+        env.seed(seed_value + seed_offset)
+        return env
+    return _init
+
+# Training with parallel environments
 def train_env(seed_value, config: TrainingConfig):
     folder = config.folder_name()
     os.makedirs(f"./tensorboard_log/{folder}/model/", exist_ok=True)
     os.makedirs(f"./data/{folder}/distance/", exist_ok=True)
     os.makedirs(f"./data/{folder}/stiffness/", exist_ok=True)
 
-    env = LegEnvBase(render_mode=None,
-                     growth_factor=config.growth_factor,
-                     growth_type=config.growth_type,
-                     stiffness_start=config.stiffness_start,
-                     stiffness_end=config.stiffness_end)
-    env.seed(seed_value)
+    # Create a vectorized environment for parallel data collection
+    env = SubprocVecEnv([make_env(i, config, seed_value) for i in range(config.n_envs)])
 
     lr_schedule = config.get_lr_schedule()
 
     if config.algorithm == 'PPO':
         model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/ppo",
-                    learning_rate=lr_schedule)
+                    learning_rate=lr_schedule,
+                    n_steps=2048 // config.n_envs)  # Ensure n_steps is divisible by n_envs
     elif config.algorithm == 'A2C':
         model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/a2c",
@@ -247,13 +265,17 @@ def train_env(seed_value, config: TrainingConfig):
     model.learn(total_timesteps=config.total_timesteps)
     final_model_path = f"./data/{folder}/final_model_seed_{seed_value}.zip"
     model.save(final_model_path)
-    print(f"✅ Model saved at: {final_model_path}")
+    print(f"Model saved at: {final_model_path}")
 
-    env.save_reward_and_displacement(folder, seed_value)
-    env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history.npy')
+    # Save results only for the first environment
+    env.env_method('save_reward_and_displacement', folder, seed_value, indices=0)
+    env.env_method('save_stiffness_history', f'./data/{folder}/stiffness/stiffness_history.npy', indices=0)
 
-    avg_eval_distance = evaluate_model(model, env, num_episodes=10)
+    # Use a single environment for evaluation
+    eval_env = make_env(0, config, seed_value)()
+    avg_eval_distance = evaluate_model(model, eval_env, num_episodes=10)
     np.save(f'./data/{folder}/distance/eval_distance_seed_{seed_value}.npy', np.array(avg_eval_distance))
+    eval_env.close()
     env.close()
 
     aggregate_and_save_results(config)

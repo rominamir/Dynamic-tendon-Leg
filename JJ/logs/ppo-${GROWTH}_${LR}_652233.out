@@ -1,0 +1,8 @@
+==========================================
+SLURM_JOB_ID = 652233
+SLURM_JOB_NODELIST = a02-20
+TMPDIR = /tmp/SLURM_652233
+==========================================
+2025-05-30 20:16:40.433636: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+slurmstepd: error: *** JOB 652233 ON a02-20 CANCELLED AT 2025-05-30T23:37:02 ***
