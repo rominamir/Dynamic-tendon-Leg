@@ -12,8 +12,10 @@
 
 
 module purge
+module load gcc/13.3
+module load cuda/12.6.3        # 加载 CUDA 模块，必要时可改
 eval "$(conda shell.bash hook)"
-conda activate lab
+mamba activate lab
 
 cd /home1/jiajinzh/Dynamic-tendon-Leg/JJ/
 

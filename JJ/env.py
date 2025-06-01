@@ -251,12 +251,12 @@ def train_env(seed_value, config: TrainingConfig):
     lr_schedule = config.get_lr_schedule()
 
     if config.algorithm == 'PPO':
-        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
+        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value, device = "cuda",
                     tensorboard_log=f"./tensorboard_log/{folder}/ppo",
                     learning_rate=lr_schedule,
                     n_steps=2048 // config.n_envs)  # Ensure n_steps is divisible by n_envs
     elif config.algorithm == 'A2C':
-        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
+        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value, device = "cuda",
                     tensorboard_log=f"./tensorboard_log/{folder}/a2c",
                     learning_rate=lr_schedule)
     else:
