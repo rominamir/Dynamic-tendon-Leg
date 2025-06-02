@@ -1,25 +1,22 @@
 #!/bin/bash
 #SBATCH --job-name=ppo-${GROWTH}_${LR}
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:a100:1
+#SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gpus-per-task=1
+#SBATCH --gpus-per-task=a100:1  
 #SBATCH --mem=32G
 #SBATCH --time=24:00:00
 #SBATCH --output=logs/%x_%j.out
 
-
-
 module purge
-module load gcc/13.3
-module load cuda/12.6.3        
+module load gcc/13.3.0
+module load cuda/12.6.3
 eval "$(conda shell.bash hook)"
 mamba activate lab
 
 cd /home1/jiajinzh/Dynamic-tendon-Leg/JJ/
 
-# Read variables passed in
 GROWTH_TYPE=$1
 LR_SCHEDULE_TYPE=$2
 
