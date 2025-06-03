@@ -1,0 +1,6 @@
+==========================================
+SLURM_JOB_ID = 667736
+SLURM_JOB_NODELIST = a02-20
+TMPDIR = /tmp/SLURM_667736
+==========================================
+slurmstepd: error: *** JOB 667736 ON a02-20 CANCELLED AT 2025-05-31T04:04:28 ***

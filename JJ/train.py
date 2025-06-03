@@ -1,12 +1,14 @@
 import argparse
 from env import train_env, TrainingConfig
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--growth_type', type=str, required=True)
     parser.add_argument('--lr_schedule_type', type=str, required=True)
     parser.add_argument('--seed_start', type=int, default=100)
-    parser.add_argument('--seed_end', type=int, default=119)
+    parser.add_argument('--seed_end', type=int, default=109)
     args = parser.parse_args()
 
     for seed in range(args.seed_start, args.seed_end + 1):
