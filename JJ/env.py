@@ -248,7 +248,7 @@ def aggregate_and_save_results(config: TrainingConfig):
     os.makedirs(save_dir, exist_ok=True)
 
     # Use growth_type in file names
-    growth_tag = config.growth_type
+    growth_tag = config.growth_type.replace(':', '_')
 
     if rewards:
         min_len = min(len(r) for r in rewards)
