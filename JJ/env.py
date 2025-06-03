@@ -37,7 +37,7 @@ class TrainingConfig:
                  lr_schedule_type='linear',
                  lr_start=5e-4,
                  lr_end=1e-5,
-                 n_envs=4):
+                 n_envs=32):
         self.algorithm = algorithm
         self.growth_type = growth_type
         self.growth_factor = growth_factor
