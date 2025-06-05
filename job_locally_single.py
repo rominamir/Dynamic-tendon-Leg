@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 growth_type =  "constant:25k"           # e.g., "curriculum_linear", "constant:30k"
 lr_schedule_type = "constant"      # e.g., "constant" or "linear"
 job_tag = "parallel_test2"          # tag output folders
-train_script = r"C:\Users\User\Desktop\New folder\AimIV\Dynamic-tendon-Leg\Dynamic-tendon-Leg\JJ\train.py"
+train_script = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\Dynamic-tendon-Leg\JJ\train.py"
 max_workers = 12                    # number of parallel jobs (adjust based on your CPU)
 seed_range = range(100, 101)       # 10 seeds
 

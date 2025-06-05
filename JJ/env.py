@@ -114,6 +114,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.qpos_history = []
         self.qvel_history = []
 
+        self.tendon_length_history = [] 
+        self.tendon_lengths_episode = []
+
+
         self.update_stiffness(self.epoch_counter)
 
     def update_stiffness(self, epoch):
@@ -156,6 +160,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.tendon_forces_episode.append(self.data.actuator_force.copy())
         self.qpos_episode.append(self.data.qpos.copy())
         self.qvel_episode.append(self.data.qvel.copy())
+        self.tendon_lengths_episode.append(self.data.ten_length.copy())
+
 
         self.steps_from_reset += 1
         self.global_step += 1
@@ -171,6 +177,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.qvel_history.append(self.qvel_episode)
             self.qpos_episode = []
             self.qvel_episode = []
+
+            self.tendon_length_history.append(self.tendon_lengths_episode)
+            self.tendon_lengths_episode = []
+
         return self.get_obs(), reward, done, False, {}
 
     def reset_model(self):
@@ -219,6 +229,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         np.save(f'{base}/qpos_seed_{seed}.npy', np.array(self.qpos_history, dtype=object))
         np.save(f'{base}/qvel_seed_{seed}.npy', np.array(self.qvel_history, dtype=object))
 
+    def save_tendon_lengths(self, folder, seed):
+        base = f'./data/{folder}/tendon_lengths'
+        os.makedirs(base, exist_ok=True)
+        np.save(f'{base}/tendon_lengths_seed_{seed}.npy', np.array(self.tendon_length_history, dtype=object))
 
 # Model evaluation
 def evaluate_model(model, env, num_episodes=10):
@@ -317,6 +331,8 @@ def train_env(seed_value, config: TrainingConfig):
     env.env_method('save_stiffness_history', f'./data/{folder}/stiffness/stiffness_history.npy', indices=0)
     env.env_method('save_tendon_forces', folder, seed_value, indices=0)
     env.env_method('save_qpos_qvel', folder, seed_value, indices=0)
+    env.env_method('save_tendon_lengths', folder, seed_value, indices=0)
+
 
 
     # Use a single environment for evaluation
