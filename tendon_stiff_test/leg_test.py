@@ -122,6 +122,8 @@ model = mujoco.MjModel.from_xml_string(model_xml)
 data = mujoco.MjData(model)
 
 # Step the simulation once to compute tendon lengths
+data.ctrl[:] = [1.0, 1.0, 1.0]  # Full activation of all 3 muscles
+
 mujoco.mj_step(model, data)
 
 # Get tendon names and lengths
@@ -130,3 +132,11 @@ for i in range(model.ntendon):
     name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_TENDON, i)
     length = data.ten_length[i]
     print(f"{name}: {length:.4f} m")
+
+
+# Get muscle (actuator) forces
+print("\nMuscle Forces:")
+for i in range(model.nu):  # model.nu == number of actuators
+    name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_ACTUATOR, i)
+    force = data.actuator_force[i]
+    print(f"{name}: {force:.4f} N")

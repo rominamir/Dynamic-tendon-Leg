@@ -61,4 +61,36 @@ plt.title("Tendon Length Over Time")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
+#plt.show()
+
+
+
+
+forces = []
+lengths = []
+times = []
+
+for i in range(n_steps):
+    mujoco.mj_step(model, data)
+
+    # Get current tendon length
+    length = data.ten_length[tendon_id]
+    lengths.append(length)
+
+    # Compute tendon force manually (spring only acts when stretched)
+    force = stiffness * (length - rest_length) if length > rest_length else 0.0
+    forces.append(force)
+
+    # Store time
+    times.append(i * dt)
+
+
+plt.figure(figsize=(8, 5))
+plt.plot(times, forces, label="Tendon Force (N)")
+plt.xlabel("Time (s)")
+plt.ylabel("Force (N)")
+plt.title("Tendon Force Over Time")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
 plt.show()
