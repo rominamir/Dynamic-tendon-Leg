@@ -1,0 +1,535 @@
+==========================================
+SLURM_JOB_ID = 709404
+SLURM_JOB_NODELIST = b01-20
+TMPDIR = /tmp/SLURM_709404
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+2025-06-03 20:25:15.394234: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+🚀 Training | Seed=100 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:21.294234: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-1:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 100: [Errno 104] Connection reset by peer
+🚀 Training | Seed=101 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:25.432956: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-2:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 101: [Errno 104] Connection reset by peer
+🚀 Training | Seed=102 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:29.566397: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-3:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 102: [Errno 104] Connection reset by peer
+🚀 Training | Seed=103 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:33.687328: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-4:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 103: [Errno 104] Connection reset by peer
+🚀 Training | Seed=104 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:37.828115: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-5:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 104: [Errno 104] Connection reset by peer
+🚀 Training | Seed=105 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:41.973893: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-6:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 105: [Errno 104] Connection reset by peer
+🚀 Training | Seed=106 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:46.054639: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-7:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 106: [Errno 104] Connection reset by peer
+🚀 Training | Seed=107 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:50.130482: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-8:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 107: [Errno 104] Connection reset by peer
+🚀 Training | Seed=108 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:54.222337: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-9:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 108: [Errno 104] Connection reset by peer
+🚀 Training | Seed=109 | Growth=constant:5k | LR=constant
+2025-06-03 20:25:58.326282: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-10:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 109: [Errno 104] Connection reset by peer
+🚀 Training | Seed=110 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:02.440155: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-11:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 110: [Errno 104] Connection reset by peer
+🚀 Training | Seed=111 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:06.529934: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-12:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 111: [Errno 104] Connection reset by peer
+🚀 Training | Seed=112 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:10.605565: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-13:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 112: [Errno 104] Connection reset by peer
+🚀 Training | Seed=113 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:15.095383: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-14:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 113: [Errno 104] Connection reset by peer
+🚀 Training | Seed=114 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:19.233974: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-15:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 114: [Errno 104] Connection reset by peer
+🚀 Training | Seed=115 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:24.429665: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-16:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 115: [Errno 104] Connection reset by peer
+🚀 Training | Seed=116 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:28.487095: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-17:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 116: [Errno 104] Connection reset by peer
+🚀 Training | Seed=117 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:32.589528: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-18:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 117: [Errno 104] Connection reset by peer
+🚀 Training | Seed=118 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:36.670209: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-19:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 118: [Errno 104] Connection reset by peer
+🚀 Training | Seed=119 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:40.778979: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-20:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 119: [Errno 104] Connection reset by peer
+🚀 Training | Seed=120 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:44.520601: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-21:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 120: [Errno 104] Connection reset by peer
+🚀 Training | Seed=121 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:48.287852: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-22:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 121: [Errno 104] Connection reset by peer
+🚀 Training | Seed=122 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:52.076605: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-23:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 122: [Errno 104] Connection reset by peer
+🚀 Training | Seed=123 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:55.847197: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-24:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 123: [Errno 104] Connection reset by peer
+🚀 Training | Seed=124 | Growth=constant:5k | LR=constant
+2025-06-03 20:26:59.676769: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-25:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 124: [Errno 104] Connection reset by peer
