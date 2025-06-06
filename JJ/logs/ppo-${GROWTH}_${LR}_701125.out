@@ -1,0 +1,60 @@
+==========================================
+SLURM_JOB_ID = 701125
+SLURM_JOB_NODELIST = b01-20
+TMPDIR = /tmp/SLURM_701125
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+2025-06-03 11:32:48.795501: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+🚀 Training | Seed=100 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 100: name 'confƒig' is not defined
+🚀 Training | Seed=101 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 101: name 'confƒig' is not defined
+🚀 Training | Seed=102 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 102: name 'confƒig' is not defined
+🚀 Training | Seed=103 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 103: name 'confƒig' is not defined
+🚀 Training | Seed=104 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 104: name 'confƒig' is not defined
+🚀 Training | Seed=105 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 105: name 'confƒig' is not defined
+🚀 Training | Seed=106 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 106: name 'confƒig' is not defined
+🚀 Training | Seed=107 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 107: name 'confƒig' is not defined
+🚀 Training | Seed=108 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 108: name 'confƒig' is not defined
+🚀 Training | Seed=109 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 109: name 'confƒig' is not defined
+🚀 Training | Seed=110 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 110: name 'confƒig' is not defined
+🚀 Training | Seed=111 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 111: name 'confƒig' is not defined
+🚀 Training | Seed=112 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 112: name 'confƒig' is not defined
+🚀 Training | Seed=113 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 113: name 'confƒig' is not defined
+🚀 Training | Seed=114 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 114: name 'confƒig' is not defined
+🚀 Training | Seed=115 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 115: name 'confƒig' is not defined
+🚀 Training | Seed=116 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 116: name 'confƒig' is not defined
+🚀 Training | Seed=117 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 117: name 'confƒig' is not defined
+🚀 Training | Seed=118 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 118: name 'confƒig' is not defined
+🚀 Training | Seed=119 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 119: name 'confƒig' is not defined
+🚀 Training | Seed=120 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 120: name 'confƒig' is not defined
+🚀 Training | Seed=121 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 121: name 'confƒig' is not defined
+🚀 Training | Seed=122 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 122: name 'confƒig' is not defined
+🚀 Training | Seed=123 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 123: name 'confƒig' is not defined
+🚀 Training | Seed=124 | Growth=constant:5k | LR=constant
+❌ Failed training for Seed 124: name 'confƒig' is not defined
