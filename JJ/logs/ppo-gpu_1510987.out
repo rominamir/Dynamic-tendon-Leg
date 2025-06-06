@@ -1,8 +1,0 @@
-==========================================
-SLURM_JOB_ID = 1510987
-SLURM_JOB_NODELIST = a03-15
-TMPDIR = /tmp/SLURM_1510987
-==========================================
-/var/spool/slurm/d/job1510987/slurm_script: line 12: conda: command not found
-/var/spool/slurm/d/job1510987/slurm_script: line 13: conda: command not found
-/var/spool/slurm/d/job1510987/slurm_script: line 16: python: command not found
