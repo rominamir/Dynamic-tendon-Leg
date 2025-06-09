@@ -7,36 +7,40 @@ model_xml = """
   <option gravity="0 0 -9.81" timestep="0.002"/>
 
   <worldbody>
+    <!-- Fixed anchor -->
     <body name="anchor" pos="0 0 0">
       <geom type="sphere" size="0.01" rgba="1 0 0 1"/>
       <site name="anchor_site" pos="0 0 0" size="0.005" />
     </body>
 
-    <body name="weight" pos="0 0 -0.2">
-      <joint name="free" type="free" damping="2"/>
-
-      <geom type="sphere" size="0.03" mass="1"/>
+    <!-- 10 kg mass hanging below -->
+    <body name="weight" pos="0 0 -0.1">
+      <joint name="free" type="free"/>
+      <geom type="sphere" size="0.03" mass="10"/>
       <site name="mass_site" pos="0 0 0" size="0.005" />
     </body>
   </worldbody>
 
   <tendon>
-    <spatial name="spring_tendon" stiffness="490.5" springlength="0.2">
+    <spatial name="spring_tendon" stiffness="2000" springlength="0.02">
       <site site="anchor_site"/>
       <site site="mass_site"/>
     </spatial>
   </tendon>
 
-  <actuator/>
+  <actuator>
+    <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
+  </actuator>
 </mujoco>
 """
 
+'''
 model = mujoco.MjModel.from_xml_string(model_xml)
 data = mujoco.MjData(model)
 
 tendon_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TENDON, "spring_tendon")
 rest_length = 0.2
-stiffness = 490.5
+stiffness = 2000
 
 sim_time = 2.0
 dt = model.opt.timestep
@@ -78,7 +82,9 @@ for i in range(n_steps):
     lengths.append(length)
 
     # Compute tendon force manually (spring only acts when stretched)
-    force = stiffness * (length - rest_length) if length > rest_length else 0.0
+    #force = stiffness * (length - rest_length) if length > rest_length else 0.0
+    force = model.tendon_stiffness[tendon_id] * max(0.0, data.ten_length[tendon_id] - model.tendon_length0[tendon_id])
+
     forces.append(force)
 
     # Store time
@@ -90,6 +96,67 @@ plt.plot(times, forces, label="Tendon Force (N)")
 plt.xlabel("Time (s)")
 plt.ylabel("Force (N)")
 plt.title("Tendon Force Over Time")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+'''
+
+import mujoco
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+model = mujoco.MjModel.from_xml_string(model_xml)
+data = mujoco.MjData(model)
+
+tendon_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TENDON, "spring_tendon")
+actuator_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "muscle_force")
+
+# Simulation config
+sim_time = 2.0
+dt = model.opt.timestep
+n_steps = int(sim_time / dt)
+
+# Full activation of muscle
+data.ctrl[actuator_id] = 1.0
+
+
+
+# Logging
+manual_forces = []
+actuator_forces = []
+lengths = []
+times = []
+
+for i in range(n_steps):
+    mujoco.mj_step(model, data)
+
+    length = data.ten_length[tendon_id]
+    lengths.append(length)
+
+
+    print(f"Tendon length at t={i*dt:.3f}: {length:.4f}")
+    # Manual spring force (passive)
+    rest_length = 0.02
+
+    spring_force = model.tendon_stiffness[tendon_id] * max(0.0, length - rest_length)
+
+    manual_forces.append(spring_force)
+
+    # Muscle actuator force
+    actuator_force = data.actuator_force[actuator_id]
+    actuator_forces.append(actuator_force)
+
+    times.append(i * dt)
+
+# Plotting
+plt.figure(figsize=(10, 6))
+plt.plot(times, manual_forces, label="Manual Tendon Spring Force (N)")
+plt.plot(times, actuator_forces, label="Actuator (Muscle) Force (N)", linestyle="--")
+plt.xlabel("Time (s)")
+plt.ylabel("Force (N)")
+plt.title("Tendon Spring vs Muscle Actuator Force")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()

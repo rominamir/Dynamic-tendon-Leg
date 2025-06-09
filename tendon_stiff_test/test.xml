@@ -11,12 +11,11 @@
     <!-- 1 kg mass hanging below -->
     <body name="weight" pos="0 0 -0.1">
       <joint name="free" type="free"/>
-      <geom type="sphere" size="0.03" mass="10"/>
+      <geom type="sphere" size="0.03" mass="1"/>
       <site name="mass_site" pos="0 0 0" size="0.005" />
     </body>
   </worldbody>
 
-  <!-- Tendon connecting the two sites -->
   <tendon>
     <spatial name="spring_tendon" stiffness="2000" springlength="0.1">
       <site site="anchor_site"/>
@@ -24,6 +23,7 @@
     </spatial>
   </tendon>
 
-  <actuator/>
+  <actuator>
+    <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000"/>
+  </actuator>
 </mujoco>
-"""

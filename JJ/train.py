@@ -3,6 +3,9 @@ from env import train_env, TrainingConfig
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
+
+print("▶️  Entered train.py main()")
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--growth_type', type=str, required=True)

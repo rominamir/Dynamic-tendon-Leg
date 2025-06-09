@@ -105,12 +105,15 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.x_start = 0
 
         # Additional data: tendon forces & kinematics
-        self.tendon_force_history = []
-        self.tendon_forces_episode = []
+        self.actuator_force_history = []
+        self.actuator_forces_episode = []
         self.qpos_episode = []
         self.qvel_episode = []
         self.qpos_history = []
         self.qvel_history = []
+
+        self.tendon_forces_history = [] 
+        self.tendon_forces_episode = []
 
         self.tendon_length_history = [] 
         self.tendon_lengths_episode = []
@@ -130,7 +133,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         elif self.growth_type == 'linear':
             self.stiffness_scaling = self.stiffness_start + progress * (self.stiffness_end - self.stiffness_start)
         elif self.growth_type.startswith('constant_'):
-            self.stiffness_scaling = float(self.growth_type.split('_')[1].replace('k', '000'))
+            #self.stiffness_scaling = float(self.growth_type.split('_')[1].replace('k', '000'))
+            self.stiffness_scaling = 500
         elif self.growth_type == 'curriculum_linear':
             if progress <= 0.25:
                 self.stiffness_scaling = self.stiffness_start
@@ -155,22 +159,28 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.reward_episode += reward
 
         # Save tendon forces and kinematics
-        self.tendon_forces_episode.append(self.data.actuator_force.copy())
+        
+        # First-time setup: find tendonforce sensor indices
+# First-time setup: get indices for all tendonforce sensors
+
         self.qpos_episode.append(self.data.qpos.copy())
         self.qvel_episode.append(self.data.qvel.copy())
         self.tendon_lengths_episode.append(self.data.ten_length.copy())
 
-
         self.steps_from_reset += 1
         self.global_step += 1
-        done = self.steps_from_reset >= self.max_episode_steps
+        done = self.steps_from_reset >= self.max_episode_steps    
         if done:
             self.rewards.append(self.reward_episode)
             self.displacements.append(x_after - self.x_start)
             self.reward_episode = 0
             # Save episode-level data
-            self.tendon_force_history.append(self.tendon_forces_episode)
+            self.actuator_force_history.append(self.actuator_forces_episode)
+            self.actuator_forces_episode = []
+
+            self.tendon_forces_history.append(self.tendon_forces_episode)
             self.tendon_forces_episode = []
+
             self.qpos_history.append(self.qpos_episode)
             self.qvel_history.append(self.qvel_episode)
             self.qpos_episode = []
@@ -178,7 +188,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
             self.tendon_length_history.append(self.tendon_lengths_episode)
             self.tendon_lengths_episode = []
-
+    
         return self.get_obs(), reward, done, False, {}
 
     def reset_model(self):
@@ -189,7 +199,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.x_start = self.data.qpos[0]
 
         # Clear episode data
-        self.tendon_forces_episode = []
+        self.actuator_forces_episode = []
         self.qpos_episode = []
         self.qvel_episode = []
         return self.get_obs()
@@ -216,10 +226,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         np.save(filename, np.array(self.stiffness_history))
 
     # Save tendon forces & kinematics data
-    def save_tendon_forces(self, folder, seed):
-        base = f'./data/{folder}/tendon_forces'
+    def save_actuator_forces(self, folder, seed):
+        base = f'./data/{folder}/actuator_forces'
         os.makedirs(base, exist_ok=True)
-        np.save(f'{base}/tendon_forces_seed_{seed}.npy', np.array(self.tendon_force_history, dtype=object))
+        np.save(f'{base}/actuator_forces_seed_{seed}.npy', np.array(self.actuator_force_history, dtype=object))
 
     def save_qpos_qvel(self, folder, seed):
         base = f'./data/{folder}/kinematics'
@@ -231,6 +241,11 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         base = f'./data/{folder}/tendon_lengths'
         os.makedirs(base, exist_ok=True)
         np.save(f'{base}/tendon_lengths_seed_{seed}.npy', np.array(self.tendon_length_history, dtype=object))
+    
+    def save_tendon_forces(self, folder, seed):
+        base = f'./data/{folder}/tendon_forces'
+        os.makedirs(base, exist_ok=True)
+        np.save(f'{base}/tendon_forces_seed_{seed}.npy', np.array(self.tendon_forces_history, dtype=object))
 
 # Model evaluation
 def evaluate_model(model, env, num_episodes=10):
@@ -302,18 +317,22 @@ def train_env(seed_value, config: TrainingConfig):
     os.makedirs(f"./data/{folder}/distance/", exist_ok=True)
     os.makedirs(f"./data/{folder}/stiffness/", exist_ok=True)
 
-    # Create a vectorized environment for parallel data collection
-    env = SubprocVecEnv([make_env(i, config, seed_value) for i in range(config.n_envs)])
+    print("1")
+    env = LegEnvBase(render_mode=None,
+                     growth_factor=config.growth_factor,
+                     growth_type=config.growth_type,
+                     stiffness_start=config.stiffness_start,
+                     stiffness_end=config.stiffness_end)
+    env.seed(seed_value)
 
     lr_schedule = config.get_lr_schedule()
 
     if config.algorithm == 'PPO':
-        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value, device = "cuda",
+        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/ppo",
-                    learning_rate=lr_schedule,
-                    n_steps=2048 // config.n_envs)  # Ensure n_steps is divisible by n_envs
+                    learning_rate=lr_schedule)
     elif config.algorithm == 'A2C':
-        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value, device = "cuda",
+        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/a2c",
                     learning_rate=lr_schedule)
     else:
@@ -323,17 +342,18 @@ def train_env(seed_value, config: TrainingConfig):
     final_model_path = f"./data/{folder}/final_model_seed_{seed_value}.zip"
     model.save(final_model_path)
     print(f"Model saved at: {final_model_path}")
-
-    # Save results only for the first environment
-    env.env_method('save_reward_and_displacement', folder, seed_value, indices=0)
-    env.env_method('save_stiffness_history', f'./data/{folder}/stiffness/stiffness_history.npy', indices=0)
-    env.env_method('save_tendon_forces', folder, seed_value, indices=0)
-    env.env_method('save_qpos_qvel', folder, seed_value, indices=0)
-    env.env_method('save_tendon_lengths', folder, seed_value, indices=0)
-
-
-
-    # Use a single environment for evaluation
+    
+    print("4")
+    # Save logs and data
+    env.save_reward_and_displacement(folder, seed_value)
+    env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history.npy')
+    env.save_actuator_forces(folder, seed_value)
+    env.save_qpos_qvel(folder, seed_value)
+    env.save_tendon_lengths(folder, seed_value)
+    env.save_tendon_forces( folder,seed_value )
+    
+    
+    # Evaluate
     eval_env = make_env(0, config, seed_value)()
     avg_eval_distance = evaluate_model(model, eval_env, num_episodes=10)
     np.save(f'./data/{folder}/distance/eval_distance_seed_{seed_value}.npy', np.array(avg_eval_distance))

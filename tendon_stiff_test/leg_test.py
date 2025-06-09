@@ -114,6 +114,10 @@ model_xml = """
         <muscle name="T_M1" tendon="T_M1"/>
         <muscle name="T_M2" tendon="T_M2"/>
     </actuator>
+    <sensor type="tendonforce" tendon="T_M0" name="t0_force"/>
+<sensor type="tendonforce" tendon="T_M1" name="t1_force"/>
+<sensor type="tendonforce" tendon="T_M2" name="t2_force"/>
+
 </mujoco>
 """
 
@@ -121,22 +125,33 @@ model_xml = """
 model = mujoco.MjModel.from_xml_string(model_xml)
 data = mujoco.MjData(model)
 
+ 
 # Step the simulation once to compute tendon lengths
 data.ctrl[:] = [1.0, 1.0, 1.0]  # Full activation of all 3 muscles
 
 mujoco.mj_step(model, data)
-
-# Get tendon names and lengths
+# Print tendon lengths
 print("Tendon Lengths:")
 for i in range(model.ntendon):
     name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_TENDON, i)
     length = data.ten_length[i]
-    print(f"{name}: {length:.4f} m")
+    print(f"  {name}: {length:.4f} m")
 
-
-# Get muscle (actuator) forces
-print("\nMuscle Forces:")
-for i in range(model.nu):  # model.nu == number of actuators
+# Print actuator (muscle) forces
+print("\nActuator (Muscle) Forces:")
+for i in range(model.nu):
     name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_ACTUATOR, i)
     force = data.actuator_force[i]
-    print(f"{name}: {force:.4f} N")
+    print(f"  {name}: {force:.4f} N")
+
+# Create buffer for tendon forces
+tendon_forces = np.zeros(model.ntendon)
+
+# Compute tendon forces
+mujoco.mj_tendonforce(model, data, tendon_forces)
+
+# Print results
+print("\nTendon Forces:")
+for i in range(model.ntendon):
+    name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_TENDON, i)
+    print(f"  {name}: {tendon_forces[i]:.4f} N")

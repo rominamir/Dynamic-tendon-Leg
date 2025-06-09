@@ -35,14 +35,15 @@
 
 # print(f"🎥 Saved video to: {video_path}")
 
+
 import imageio
 from stable_baselines3 import PPO
 from env import LegEnvBase  # Replace with your actual env file
 import mujoco
 
-folder = r"C:\Users\User\Desktop\New folder\AimIV\Dynamic-tendon-Leg\Dynamic-tendon-Leg\data\LegEnv_May28_constant30k_constant30kOnly_constant_5e-04_PPO"
-model_path = fr"{folder}/final_model_seed_100.zip"
-video_path = fr"{folder}/final_run_100_40k.gif"
+folder = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\data\LegEnv_Jun06_constant_20k_constant_5e-04_PPO_seeds_100-100"
+model_path = fr"{folder}/final_model_seed_101.zip"
+video_path = fr"{folder}/final_run_100_30k.gif"
 
 # Load trained model and environment
 env = LegEnvBase(render_mode="human")  # Must be in rgb_array mode
@@ -73,3 +74,4 @@ env.close()
 
 # Save as gif (use duration, not fps)
 imageio.mimsave(video_path, frames, duration=33)
+
