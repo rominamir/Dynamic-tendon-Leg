@@ -135,8 +135,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         elif self.growth_type == 'linear':
             self.stiffness_scaling = self.stiffness_start + progress * (self.stiffness_end - self.stiffness_start)
         elif self.growth_type.startswith('constant_'):
-            #self.stiffness_scaling = float(self.growth_type.split('_')[1].replace('k', '000'))
-            self.stiffness_scaling = 500
+            self.stiffness_scaling = float(self.growth_type.split('_')[1].replace('k', '000'))
+            #self.stiffness_scaling = 500
         elif self.growth_type == 'curriculum_linear':
             if progress <= 0.25:
                 self.stiffness_scaling = self.stiffness_start
