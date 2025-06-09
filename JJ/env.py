@@ -37,7 +37,7 @@ class TrainingConfig:
                  lr_schedule_type='linear',
                  lr_start=5e-4,
                  lr_end=1e-5,
-                 n_envs=32):
+                 n_envs=1):
         self.algorithm = algorithm
         self.growth_type = growth_type
         self.growth_factor = growth_factor
@@ -49,18 +49,20 @@ class TrainingConfig:
         self.lr_start = lr_start
         self.lr_end = lr_end
         self.n_envs = n_envs
+        self.run_date = datetime.now().strftime('%b%d')
+
 
     def format_k(self, x):
         return f"{int(x/1000)}k" if x % 1000 == 0 else str(x)
 
     def folder_name(self):
-        date_tag = datetime.now().strftime('%b%d')
+        date_tag = self.run_date 
         if self.lr_schedule_type == 'constant':
             lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}"
         else:
             lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
         seeds_tag = f"seeds_{100}-{100 + self.num_seeds - 1}"
-        safe_growth_type = self.growth_type.replace(':', '_')  # Replace colon with underscore
+        safe_growth_type = self.growth_type.replace(':', '_')
         return f"LegEnv_{date_tag}_{safe_growth_type}_{lr_tag}_{self.algorithm}_{seeds_tag}"
 
     def get_lr_schedule(self):
@@ -330,7 +332,12 @@ def train_env(seed_value, config: TrainingConfig):
     if config.algorithm == 'PPO':
         model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/ppo",
+<<<<<<< HEAD
                     learning_rate=lr_schedule)
+=======
+                    learning_rate=lr_schedule, n_epochs = 3,
+                    n_steps=2048 // config.n_envs)  # Ensure n_steps is divisible by n_envs
+>>>>>>> cfaefa7622221fc77afbf97fecb612bfcca14817
     elif config.algorithm == 'A2C':
         model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/a2c",

@@ -1,0 +1,561 @@
+==========================================
+SLURM_JOB_ID = 709412
+SLURM_JOB_NODELIST = b18-16
+TMPDIR = /tmp/SLURM_709412
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+2025-06-03 20:25:14.074529: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:14.100810: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+🚀 Training | Seed=100 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:18.670868: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:18.696464: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-1:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 100: [Errno 104] Connection reset by peer
+🚀 Training | Seed=101 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:21.928187: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:21.953648: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-2:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 101: [Errno 104] Connection reset by peer
+🚀 Training | Seed=102 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:25.183061: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:25.208273: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-3:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 102: [Errno 104] Connection reset by peer
+🚀 Training | Seed=103 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:28.425235: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:28.450495: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-4:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 103: [Errno 104] Connection reset by peer
+🚀 Training | Seed=104 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:31.665982: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:31.691502: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-5:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 104: [Errno 104] Connection reset by peer
+🚀 Training | Seed=105 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:34.910471: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:34.935674: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-6:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 105: [Errno 104] Connection reset by peer
+🚀 Training | Seed=106 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:38.187712: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:38.212891: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-7:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 106: [Errno 104] Connection reset by peer
+🚀 Training | Seed=107 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:41.421652: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:41.446688: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-8:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 107: [Errno 104] Connection reset by peer
+🚀 Training | Seed=108 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:44.658153: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:44.683141: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-9:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 108: [Errno 104] Connection reset by peer
+🚀 Training | Seed=109 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:47.889177: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:47.914387: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-10:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 109: [Errno 104] Connection reset by peer
+🚀 Training | Seed=110 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:51.117882: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:51.142990: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-11:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 110: [Errno 104] Connection reset by peer
+🚀 Training | Seed=111 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:54.346216: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:54.371439: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-12:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 111: [Errno 104] Connection reset by peer
+🚀 Training | Seed=112 | Growth=constant:45k | LR=constant
+2025-06-03 20:25:57.568676: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:25:57.593947: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-13:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 112: [Errno 104] Connection reset by peer
+🚀 Training | Seed=113 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:00.795839: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:00.820948: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-14:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 113: [Errno 104] Connection reset by peer
+🚀 Training | Seed=114 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:04.020852: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:04.046070: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-15:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 114: [Errno 104] Connection reset by peer
+🚀 Training | Seed=115 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:07.247687: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:07.272834: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-16:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 115: [Errno 104] Connection reset by peer
+🚀 Training | Seed=116 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:10.446969: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:10.472083: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-17:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 116: [Errno 104] Connection reset by peer
+🚀 Training | Seed=117 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:13.686740: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:13.712360: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-18:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 117: [Errno 104] Connection reset by peer
+🚀 Training | Seed=118 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:17.007826: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:17.033515: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-19:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 118: [Errno 104] Connection reset by peer
+🚀 Training | Seed=119 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:20.754966: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:20.780239: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-20:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 119: [Errno 104] Connection reset by peer
+🚀 Training | Seed=120 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:24.006825: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:24.032071: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-21:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 120: [Errno 104] Connection reset by peer
+🚀 Training | Seed=121 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:27.228722: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:27.254027: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-22:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 121: [Errno 104] Connection reset by peer
+🚀 Training | Seed=122 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:30.436314: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:30.461442: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-23:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 122: [Errno 104] Connection reset by peer
+🚀 Training | Seed=123 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:33.666298: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:33.691526: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-24:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 123: [Errno 104] Connection reset by peer
+🚀 Training | Seed=124 | Growth=constant:45k | LR=constant
+2025-06-03 20:26:36.886934: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-06-03 20:26:36.912212: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Process ForkServerProcess-25:
+Traceback (most recent call last):
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 29, in _worker
+    env = _patch_env(env_fn_wrapper.var())
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 277, in _init
+    env = LegEnvBase(render_mode=None,
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in __init__
+    mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 319, in __init__
+    super().__init__(
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/mujoco_env.py", line 67, in __init__
+    int(np.round(1.0 / self.dt)) == self.metadata["render_fps"]
+AssertionError: Expected value: 100, Actual value: 40
+❌ Failed training for Seed 124: [Errno 104] Connection reset by peer

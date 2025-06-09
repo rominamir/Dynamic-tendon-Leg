@@ -1,0 +1,1 @@
+June3 changed timestep in Mujoco to 0.002
