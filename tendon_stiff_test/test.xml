@@ -1,0 +1,29 @@
+<mujoco model="tendon_stretch_test">
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <worldbody>
+    <!-- Fixed anchor -->
+    <body name="anchor" pos="0 0 0">
+      <geom type="sphere" size="0.01" rgba="1 0 0 1"/>
+      <site name="anchor_site" pos="0 0 0" size="0.005" />
+    </body>
+
+    <!-- 1 kg mass hanging below -->
+    <body name="weight" pos="0 0 -0.1">
+      <joint name="free" type="free"/>
+      <geom type="sphere" size="0.03" mass="1"/>
+      <site name="mass_site" pos="0 0 0" size="0.005" />
+    </body>
+  </worldbody>
+
+  <tendon>
+    <spatial name="spring_tendon" stiffness="2000" springlength="0.1">
+      <site site="anchor_site"/>
+      <site site="mass_site"/>
+    </spatial>
+  </tendon>
+
+  <actuator>
+    <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000"/>
+  </actuator>
+</mujoco>

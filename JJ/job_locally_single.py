@@ -3,12 +3,12 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-growth_type =  "constant:30k"           # e.g., "curriculum_linear", "constant:30k"
+growth_type =  "constant_30k"           # e.g., "curriculum_linear", "constant:30k"
 lr_schedule_type = "constant"      # e.g., "constant" or "linear"
 job_tag = "test_forces"          # tag output folders
 train_script = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\Dynamic-tendon-Leg\JJ\train.py"
-max_workers = 12                    # number of parallel jobs (adjust based on your CPU)
-seed_range = range(100, 102)       # 10 seeds
+max_workers = 10                # number of parallel jobs (adjust based on your CPU)
+seed_range = range(100, 101)       # 10 seeds
 
 def run_seed(seed):
     env = os.environ.copy()
@@ -27,12 +27,6 @@ def run_seed(seed):
     try:
         #process = subprocess.run(command, env=env, shell=False, capture_output=True, text=True)
         process = subprocess.run(command, env=env, shell=False, capture_output=True, text=True, encoding='utf-8', errors='replace')
-        # process = subprocess.Popen(command, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
-
-        # for line in process.stdout:
-        #     print(f"[Seed {seed}] {line.strip()}")
-
-        process.wait()
 
         duration = time.time() - start_time
         if process.returncode == 0:
