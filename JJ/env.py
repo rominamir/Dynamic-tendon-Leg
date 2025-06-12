@@ -138,6 +138,11 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         self.update_stiffness(self.epoch_counter)
 
+        self.frames = []
+        self.record_video = False
+        self.seed_value = None
+
+
     def update_stiffness(self, epoch):
         progress = epoch / max(1, self.num_epochs)
         if self.growth_type == 'exponential':
@@ -171,30 +176,33 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
         x_after = self.data.qpos[0]
         velocity = (x_after - x_before) / self.dt
-        #moving forward reward with penalty 
         reward = max(velocity, 0) - max(-velocity, 0)
 
         self.reward_episode += reward
 
-        # Save tendon forces and kinematics
+        # Save kinematic and force data
         self.qpos_episode.append(self.data.qpos.copy())
         self.qvel_episode.append(self.data.qvel.copy())
         self.tendon_lengths_episode.append(self.data.ten_length.copy())
         self.actuator_forces_episode.append(self.data.actuator_force.copy())
 
+        # Save frame for video if recording
+        if self.record_video:
+            frame = self.render(mode="rgb_array")
+            self.frames.append(frame)
+
         self.steps_from_reset += 1
         self.global_step += 1
-        done = self.steps_from_reset >= self.max_episode_steps    
+
+        done = self.steps_from_reset >= self.max_episode_steps
         if done:
             self.rewards.append(self.reward_episode)
             self.displacements.append(x_after - self.x_start)
             self.reward_episode = 0
+
             # Save episode-level data
             self.actuator_force_history.append(self.actuator_forces_episode)
             self.actuator_forces_episode = []
-
-            #self.tendon_forces_history.append(self.tendon_forces_episode)
-            #self.tendon_forces_episode = []
 
             self.qpos_history.append(self.qpos_episode)
             self.qvel_history.append(self.qvel_episode)
@@ -203,8 +211,13 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
             self.tendon_length_history.append(self.tendon_lengths_episode)
             self.tendon_lengths_episode = []
-    
+
+            # 🎥 Save final epoch data and video
+            if self.record_video:
+                self.save_final_epoch_recording()
+
         return self.get_obs(), reward, done, False, {}
+
     def set_state(self, qpos, qvel):
         assert hasattr(self, 'model') and hasattr(self, 'data'), "model/data not initialized"
         assert qpos.shape == (self.model.nq,)
@@ -224,6 +237,14 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.epoch_counter += 1
         self.update_stiffness(self.epoch_counter)
         self.reward_episode = 0
+
+        # Enable the recording for the last epoch
+        if self.epoch_counter == self.num_epochs:
+            self.record_video = True
+            self.frames = []
+            print(f"🎥 Recording video for final epoch (#{self.epoch_counter})")
+        else:
+            self.record_video = False
         
         # Fixed initial state (replace with desired values if needed)
         initial_qpos = np.zeros(self.model.nq)
@@ -282,6 +303,21 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         base = f'./data/{folder}/tendon_forces'
         os.makedirs(base, exist_ok=True)
         np.save(f'{base}/tendon_forces_seed_{seed}.npy', np.array(self.tendon_forces_history, dtype=object))
+
+    def save_final_epoch_recording(self):
+        import imageio
+        folder = f"./recordings/final_epoch_seed_{self.seed_value}"
+        os.makedirs(folder, exist_ok=True)
+
+        np.save(f"{folder}/qpos.npy", np.array(self.qpos_episode))
+        np.save(f"{folder}/qvel.npy", np.array(self.qvel_episode))
+        np.save(f"{folder}/tendon_lengths.npy", np.array(self.tendon_lengths_episode))
+        np.save(f"{folder}/actuator_forces.npy", np.array(self.actuator_forces_episode))
+        np.save(f"{folder}/reward.npy", np.array([self.reward_episode]))
+        imageio.mimsave(f"{folder}/episode.mp4", self.frames, fps=30)
+
+        print(f"Saved final epoch data and video to: {folder}")
+
 
    
 
@@ -371,7 +407,7 @@ def train_env(seed_value, config: TrainingConfig):
                      growth_type=config.growth_type,
                      stiffness_start=config.stiffness_start,
                      stiffness_end=config.stiffness_end)
-    
+    env.seed_value = seed_value
     env.seed(fix_seed_value)
 
     lr_schedule = config.get_lr_schedule()
