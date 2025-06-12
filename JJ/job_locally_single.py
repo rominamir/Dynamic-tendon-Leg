@@ -8,7 +8,7 @@ lr_schedule_type = "constant"      # e.g., "constant" or "linear"
 job_tag = "test_forces"          # tag output folders
 train_script = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\Dynamic-tendon-Leg\JJ\train.py"
 max_workers = 10                # number of parallel jobs (adjust based on your CPU)
-seed_range = range(100, 101)       # 10 seeds
+seed_range = range(110, 120)       # 10 seeds
 
 def run_seed(seed):
     env = os.environ.copy()

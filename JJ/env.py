@@ -171,6 +171,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.do_simulation(action, self.frame_skip)
         x_after = self.data.qpos[0]
         velocity = (x_after - x_before) / self.dt
+        #moving forward reward with penalty 
         reward = max(velocity, 0) - max(-velocity, 0)
 
         self.reward_episode += reward
@@ -204,12 +205,33 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.tendon_lengths_episode = []
     
         return self.get_obs(), reward, done, False, {}
+    def set_state(self, qpos, qvel):
+        assert hasattr(self, 'model') and hasattr(self, 'data'), "model/data not initialized"
+        assert qpos.shape == (self.model.nq,)
+        assert qvel.shape == (self.model.nv,)
+
+        self.data.qpos[:] = qpos
+        self.data.qvel[:] = qvel
+
+        try:
+            mujoco.mj_forward(self.model, self.data)
+        except Exception as e:
+            print("mj_forward failed:", e)
+            raise
 
     def reset_model(self):
         self.steps_from_reset = 0
         self.epoch_counter += 1
         self.update_stiffness(self.epoch_counter)
         self.reward_episode = 0
+        
+        # Fixed initial state (replace with desired values if needed)
+        initial_qpos = np.zeros(self.model.nq)
+        initial_qvel = np.zeros(self.model.nv)
+
+
+        self.set_state(initial_qpos, initial_qvel)  # sets qpos and qvel
+        
         self.x_start = self.data.qpos[0]
 
         # Clear episode data
@@ -341,14 +363,16 @@ def train_env(seed_value, config: TrainingConfig):
     os.makedirs(f"./data/{folder}/distance/", exist_ok=True)
     os.makedirs(f"./data/{folder}/stiffness/", exist_ok=True)
 
-    set_global_seeds(seed_value)  
-    
+    fix_seed_value = 404
+    set_global_seeds(fix_seed_value)  
+
     env = LegEnvBase(render_mode=None,
                      growth_factor=config.growth_factor,
                      growth_type=config.growth_type,
                      stiffness_start=config.stiffness_start,
                      stiffness_end=config.stiffness_end)
-    env.seed(seed_value)
+    
+    env.seed(fix_seed_value)
 
     lr_schedule = config.get_lr_schedule()
 
