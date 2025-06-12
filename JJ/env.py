@@ -4,11 +4,26 @@ from datetime import datetime
 import gym
 from gym import utils
 import mujoco
-import mujoco_env
+import  mujoco_env
 from stable_baselines3 import PPO, A2C
 from stable_baselines3.common.vec_env import SubprocVecEnv
-
+#from mujoco_py import MjViewer
 # Learning rate scheduler
+# utils.py or top of your main training script
+
+def set_global_seeds(seed):
+    import os
+    import random
+    import numpy as np
+    import torch
+
+    random.seed(seed)
+    np.random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
 class LearningRateSchedule:
     def __init__(self, schedule_type='constant', lr_start=3e-4, lr_end=1e-5, total_timesteps=1_000_000):
         self.schedule_type = schedule_type
@@ -75,7 +90,7 @@ class TrainingConfig:
 
 # Custom Mujoco environment
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
-    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
+    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40} #40 for 0.005 ts, 100 for 0.002 ts
 
     def __init__(self, xml_file='leg.xml', render_mode='none', seed=None,
                  stiffness_start=5000, stiffness_end=50000, num_epochs=1000,
@@ -161,13 +176,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.reward_episode += reward
 
         # Save tendon forces and kinematics
-        
-        # First-time setup: find tendonforce sensor indices
-# First-time setup: get indices for all tendonforce sensors
-
         self.qpos_episode.append(self.data.qpos.copy())
         self.qvel_episode.append(self.data.qvel.copy())
         self.tendon_lengths_episode.append(self.data.ten_length.copy())
+        self.actuator_forces_episode.append(self.data.actuator_force.copy())
 
         self.steps_from_reset += 1
         self.global_step += 1
@@ -180,8 +192,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.actuator_force_history.append(self.actuator_forces_episode)
             self.actuator_forces_episode = []
 
-            self.tendon_forces_history.append(self.tendon_forces_episode)
-            self.tendon_forces_episode = []
+            #self.tendon_forces_history.append(self.tendon_forces_episode)
+            #self.tendon_forces_episode = []
 
             self.qpos_history.append(self.qpos_episode)
             self.qvel_history.append(self.qvel_episode)
@@ -248,6 +260,16 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         base = f'./data/{folder}/tendon_forces'
         os.makedirs(base, exist_ok=True)
         np.save(f'{base}/tendon_forces_seed_{seed}.npy', np.array(self.tendon_forces_history, dtype=object))
+
+   
+
+    # def render(self, mode="human"):
+    #     if mode == "human":
+    #         if self.viewer is None:
+    #             self.viewer = MjViewer(self.sim)
+    #         self.viewer.render()
+    #     elif mode == "rgb_array":
+    #         return self.sim.render(width=640, height=480, camera_name="Chassis_camera")
 
 # Model evaluation
 def evaluate_model(model, env, num_episodes=10):
@@ -319,7 +341,8 @@ def train_env(seed_value, config: TrainingConfig):
     os.makedirs(f"./data/{folder}/distance/", exist_ok=True)
     os.makedirs(f"./data/{folder}/stiffness/", exist_ok=True)
 
-    print("1")
+    set_global_seeds(seed_value)  
+    
     env = LegEnvBase(render_mode=None,
                      growth_factor=config.growth_factor,
                      growth_type=config.growth_type,
@@ -332,12 +355,7 @@ def train_env(seed_value, config: TrainingConfig):
     if config.algorithm == 'PPO':
         model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/ppo",
-<<<<<<< HEAD
                     learning_rate=lr_schedule)
-=======
-                    learning_rate=lr_schedule, n_epochs = 3,
-                    n_steps=2048 // config.n_envs)  # Ensure n_steps is divisible by n_envs
->>>>>>> cfaefa7622221fc77afbf97fecb612bfcca14817
     elif config.algorithm == 'A2C':
         model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
                     tensorboard_log=f"./tensorboard_log/{folder}/a2c",
