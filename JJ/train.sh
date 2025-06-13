@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=ppo-${GROWTH}_${LR}_s${SEED}
+#SBATCH --job-name=ppo-${GROWTH}_${LR}
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -19,6 +19,11 @@ cd /home1/jiajinzh/Dynamic-tendon-Leg/JJ/
 
 GROWTH_TYPE=$1
 LR_SCHEDULE_TYPE=$2
-SEED=$3
+SEED_START=$3
+SEED_END=$4
 
-python train.py --growth_type ${GROWTH_TYPE} --lr_schedule_type ${LR_SCHEDULE_TYPE} --seed ${SEED}
+python train.py \
+  --growth_type ${GROWTH_TYPE} \
+  --lr_schedule_type ${LR_SCHEDULE_TYPE} \
+  --seed_start ${SEED_START} \
+  --seed_end ${SEED_END}
