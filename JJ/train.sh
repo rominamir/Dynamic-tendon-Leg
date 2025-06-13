@@ -19,11 +19,5 @@ cd /home1/jiajinzh/Dynamic-tendon-Leg/JJ/
 
 GROWTH_TYPE=$1
 LR_SCHEDULE_TYPE=$2
-SEED_START=$3
-SEED_END=$4
 
-python train.py \
-  --growth_type ${GROWTH_TYPE} \
-  --lr_schedule_type ${LR_SCHEDULE_TYPE} \
-  --seed_start ${SEED_START} \
-  --seed_end ${SEED_END}
+python train.py --growth_type ${GROWTH_TYPE} --lr_schedule_type ${LR_SCHEDULE_TYPE} --seed_start 100 --seed_end 124
