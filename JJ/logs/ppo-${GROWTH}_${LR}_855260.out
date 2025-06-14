@@ -1,0 +1,18 @@
+==========================================
+SLURM_JOB_ID = 855260
+SLURM_JOB_NODELIST = a01-01
+TMPDIR = /tmp/SLURM_855260
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+2025-06-13 13:29:26.797921: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+🚀 Training | Seed=100 | Growth=constant_30k | LR=constant
+❌ Failed training for Seed 100: 'TrainingConfig' object has no attribute 'max_episode_steps'
+🚀 Training | Seed=101 | Growth=constant_30k | LR=constant
+❌ Failed training for Seed 101: 'TrainingConfig' object has no attribute 'max_episode_steps'
+📊 Aggregating results from all seeds...
+Saved aggregated reward mean and SE at ./data/aggregated_results/LegEnv_Jun13_constant_30k_constant_5e-04_PPO_seeds_100-101/ with growth type 'constant_30k'
+Saved aggregated displacement mean and SE at ./data/aggregated_results/LegEnv_Jun13_constant_30k_constant_5e-04_PPO_seeds_100-101/ with growth type 'constant_30k'
+✅ Aggregation complete.

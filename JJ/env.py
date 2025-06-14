@@ -4,19 +4,14 @@ from datetime import datetime
 import gym
 from gym import utils
 import mujoco
-import  mujoco_env
+import mujoco_env
 from stable_baselines3 import PPO, A2C
 from stable_baselines3.common.vec_env import SubprocVecEnv
-#from mujoco_py import MjViewer
+
 # Learning rate scheduler
-# utils.py or top of your main training script
-
 def set_global_seeds(seed):
-    import os
     import random
-    import numpy as np
     import torch
-
     random.seed(seed)
     np.random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -50,6 +45,7 @@ class TrainingConfig:
                  num_seeds=10,
                  total_timesteps=1_000_000,
                  lr_schedule_type='linear',
+                 max_episode_steps=1000,
                  lr_start=5e-4,
                  lr_end=1e-5,
                  n_envs=1):
@@ -60,22 +56,19 @@ class TrainingConfig:
         self.stiffness_end = stiffness_end
         self.num_seeds = num_seeds
         self.total_timesteps = total_timesteps
+        self.max_episode_steps = max_episode_steps
         self.lr_schedule_type = lr_schedule_type
         self.lr_start = lr_start
         self.lr_end = lr_end
         self.n_envs = n_envs
         self.run_date = datetime.now().strftime('%b%d')
 
-
     def format_k(self, x):
         return f"{int(x/1000)}k" if x % 1000 == 0 else str(x)
 
     def folder_name(self):
         date_tag = self.run_date 
-        if self.lr_schedule_type == 'constant':
-            lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}"
-        else:
-            lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
+        lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}" if self.lr_schedule_type == 'constant' else f"{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
         seeds_tag = f"seeds_{100}-{100 + self.num_seeds - 1}"
         safe_growth_type = self.growth_type.replace(':', '_')
         return f"LegEnv_{date_tag}_{safe_growth_type}_{lr_tag}_{self.algorithm}_{seeds_tag}"
@@ -90,7 +83,7 @@ class TrainingConfig:
 
 # Custom Mujoco environment
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
-    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40} #40 for 0.005 ts, 100 for 0.002 ts
+    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
 
     def __init__(self, xml_file='leg.xml', render_mode='none', seed=None,
                  stiffness_start=5000, stiffness_end=50000, num_epochs=1000,
@@ -121,27 +114,20 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.displacements = []
         self.x_start = 0
 
-        # Additional data: tendon forces & kinematics
         self.actuator_force_history = []
         self.actuator_forces_episode = []
         self.qpos_episode = []
         self.qvel_episode = []
         self.qpos_history = []
         self.qvel_history = []
-
         self.tendon_forces_history = [] 
         self.tendon_forces_episode = []
-
         self.tendon_length_history = [] 
         self.tendon_lengths_episode = []
 
-
         self.update_stiffness(self.epoch_counter)
-
-        self.frames = []
-        self.record_video = False
         self.seed_value = None
-
+        self.total_episodes_expected = None
 
     def update_stiffness(self, epoch):
         progress = epoch / max(1, self.num_epochs)
@@ -156,7 +142,6 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.stiffness_scaling = self.stiffness_start + progress * (self.stiffness_end - self.stiffness_start)
         elif self.growth_type.startswith('constant_'):
             self.stiffness_scaling = float(self.growth_type.split('_')[1].replace('k', '000'))
-            #self.stiffness_scaling = 500
         elif self.growth_type == 'curriculum_linear':
             if progress <= 0.25:
                 self.stiffness_scaling = self.stiffness_start
@@ -180,16 +165,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         self.reward_episode += reward
 
-        # Save kinematic and force data
         self.qpos_episode.append(self.data.qpos.copy())
         self.qvel_episode.append(self.data.qvel.copy())
         self.tendon_lengths_episode.append(self.data.ten_length.copy())
         self.actuator_forces_episode.append(self.data.actuator_force.copy())
-
-        # Save frame for video if recording
-        if self.record_video:
-            frame = self.render(mode="rgb_array")
-            self.frames.append(frame)
 
         self.steps_from_reset += 1
         self.global_step += 1
@@ -200,21 +179,16 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             self.displacements.append(x_after - self.x_start)
             self.reward_episode = 0
 
-            # Save episode-level data
             self.actuator_force_history.append(self.actuator_forces_episode)
             self.actuator_forces_episode = []
-
             self.qpos_history.append(self.qpos_episode)
             self.qvel_history.append(self.qvel_episode)
             self.qpos_episode = []
             self.qvel_episode = []
-
             self.tendon_length_history.append(self.tendon_lengths_episode)
+            self.tendon_forces_history.append(self.tendon_forces_episode)
             self.tendon_lengths_episode = []
-
-            # 🎥 Save final epoch data and video
-            if self.record_video:
-                self.save_final_epoch_recording()
+            self.tendon_forces_episode = []   
 
         return self.get_obs(), reward, done, False, {}
 
@@ -238,27 +212,18 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.update_stiffness(self.epoch_counter)
         self.reward_episode = 0
 
-        # Enable the recording for the last epoch
-        if self.epoch_counter == self.num_epochs:
-            self.record_video = True
-            self.frames = []
-            print(f"🎥 Recording video for final epoch (#{self.epoch_counter})")
-        else:
-            self.record_video = False
-        
-        # Fixed initial state (replace with desired values if needed)
         initial_qpos = np.zeros(self.model.nq)
         initial_qvel = np.zeros(self.model.nv)
+        self.set_state(initial_qpos, initial_qvel)
 
-
-        self.set_state(initial_qpos, initial_qvel)  # sets qpos and qvel
-        
         self.x_start = self.data.qpos[0]
 
-        # Clear episode data
         self.actuator_forces_episode = []
         self.qpos_episode = []
         self.qvel_episode = []
+        self.tendon_lengths_episode = []
+        self.tendon_forces_episode = []
+
         return self.get_obs()
 
     def get_obs(self):
@@ -273,6 +238,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.observation_space.seed(seed)
 
     def save_reward_and_displacement(self, folder, seed):
+        print(f"Saved reward: {self.rewards[:5]}... length={len(self.rewards)}")
         base = f'./data/{folder}/distance'
         os.makedirs(base, exist_ok=True)
         np.save(f'{base}/reward_history_seed_{seed}.npy', np.array(self.rewards))
@@ -282,7 +248,6 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         np.save(filename, np.array(self.stiffness_history))
 
-    # Save tendon forces & kinematics data
     def save_actuator_forces(self, folder, seed):
         base = f'./data/{folder}/actuator_forces'
         os.makedirs(base, exist_ok=True)
@@ -303,31 +268,6 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         base = f'./data/{folder}/tendon_forces'
         os.makedirs(base, exist_ok=True)
         np.save(f'{base}/tendon_forces_seed_{seed}.npy', np.array(self.tendon_forces_history, dtype=object))
-
-    def save_final_epoch_recording(self):
-        import imageio
-        folder = f"./recordings/final_epoch_seed_{self.seed_value}"
-        os.makedirs(folder, exist_ok=True)
-
-        np.save(f"{folder}/qpos.npy", np.array(self.qpos_episode))
-        np.save(f"{folder}/qvel.npy", np.array(self.qvel_episode))
-        np.save(f"{folder}/tendon_lengths.npy", np.array(self.tendon_lengths_episode))
-        np.save(f"{folder}/actuator_forces.npy", np.array(self.actuator_forces_episode))
-        np.save(f"{folder}/reward.npy", np.array([self.reward_episode]))
-        imageio.mimsave(f"{folder}/episode.mp4", self.frames, fps=30)
-
-        print(f"Saved final epoch data and video to: {folder}")
-
-
-   
-
-    # def render(self, mode="human"):
-    #     if mode == "human":
-    #         if self.viewer is None:
-    #             self.viewer = MjViewer(self.sim)
-    #         self.viewer.render()
-    #     elif mode == "rgb_array":
-    #         return self.sim.render(width=640, height=480, camera_name="Chassis_camera")
 
 # Model evaluation
 def evaluate_model(model, env, num_episodes=10):
@@ -358,7 +298,6 @@ def aggregate_and_save_results(config: TrainingConfig):
     save_dir = f'./data/aggregated_results/{folder}/'
     os.makedirs(save_dir, exist_ok=True)
 
-    # Use growth_type in file names
     growth_tag = config.growth_type.replace(':', '_')
 
     if rewards:
@@ -379,16 +318,31 @@ def aggregate_and_save_results(config: TrainingConfig):
         np.save(os.path.join(save_dir, f'displacement_se_{growth_tag}.npy'), displacement_se)
         print(f"Saved aggregated displacement mean and SE at {save_dir} with growth type '{growth_tag}'")
 
-
 # Factory function for parallel environment creation
 def make_env(seed_offset, config, seed_value):
     def _init():
-        env = LegEnvBase(render_mode=None,
-                         growth_factor=config.growth_factor,
-                         growth_type=config.growth_type,
-                         stiffness_start=config.stiffness_start,
-                         stiffness_end=config.stiffness_end)
-        env.seed(seed_value + seed_offset)
+        print("🔧 Creating LegEnvBase...")
+        is_slurm = "SLURM_JOB_ID" in os.environ
+        render_mode = None if is_slurm else "rgb_array"
+        
+        env = LegEnvBase(
+            render_mode=render_mode,
+            growth_factor=config.growth_factor,
+            growth_type=config.growth_type,
+            stiffness_start=config.stiffness_start,
+            stiffness_end=config.stiffness_end
+        )
+
+        if env is None:
+            raise RuntimeError("❌ Failed to create environment!")
+
+        print("✅ Created LegEnvBase:", type(env))
+
+        full_seed = seed_value + seed_offset
+        env.seed(full_seed)
+        env.action_space.seed(full_seed)
+        env.observation_space.seed(full_seed)
+
         return env
     return _init
 
@@ -400,49 +354,71 @@ def train_env(seed_value, config: TrainingConfig):
     os.makedirs(f"./data/{folder}/stiffness/", exist_ok=True)
 
     fix_seed_value = 404
-    set_global_seeds(fix_seed_value)  
+    set_global_seeds(fix_seed_value)
 
-    env = LegEnvBase(render_mode=None,
-                     growth_factor=config.growth_factor,
-                     growth_type=config.growth_type,
-                     stiffness_start=config.stiffness_start,
-                     stiffness_end=config.stiffness_end)
+    total_episodes = config.total_timesteps // config.max_episode_steps
+    is_slurm = "SLURM_JOB_ID" in os.environ
+    render_mode = None if is_slurm else "rgb_array"
+
+    env = LegEnvBase(
+        render_mode=render_mode,
+        growth_factor=config.growth_factor,
+        growth_type=config.growth_type,
+        stiffness_start=config.stiffness_start,
+        stiffness_end=config.stiffness_end,
+        num_epochs=total_episodes,
+        max_episode_steps=config.max_episode_steps
+    )
+    env.total_episodes_expected = total_episodes
     env.seed_value = seed_value
     env.seed(fix_seed_value)
 
     lr_schedule = config.get_lr_schedule()
 
     if config.algorithm == 'PPO':
-        model = PPO('MlpPolicy', env, verbose=1, seed=seed_value,
-                    tensorboard_log=f"./tensorboard_log/{folder}/ppo",
-                    learning_rate=lr_schedule)
+        model = PPO(
+            'MlpPolicy',
+            env,
+            verbose=1,
+            seed=seed_value,
+            tensorboard_log=f"./tensorboard_log/{folder}/ppo",
+            learning_rate=lr_schedule,
+            normalize_advantage=True
+        )
     elif config.algorithm == 'A2C':
-        model = A2C('MlpPolicy', env, verbose=1, seed=seed_value,
-                    tensorboard_log=f"./tensorboard_log/{folder}/a2c",
-                    learning_rate=lr_schedule)
+        model = A2C(
+            'MlpPolicy',
+            env,
+            verbose=1,
+            seed=seed_value,
+            tensorboard_log=f"./tensorboard_log/{folder}/a2c",
+            learning_rate=lr_schedule
+        )
     else:
-        raise ValueError("Unsupported algorithm! Choose between 'PPO' and 'A2C'")
+        raise ValueError("Unsupported algorithm. Choose between 'PPO' and 'A2C'.")
 
     model.learn(total_timesteps=config.total_timesteps)
     final_model_path = f"./data/{folder}/final_model_seed_{seed_value}.zip"
     model.save(final_model_path)
     print(f"Model saved at: {final_model_path}")
-    
-    print("4")
-    # Save logs and data
+
     env.save_reward_and_displacement(folder, seed_value)
-    env.save_stiffness_history(f'./data/{folder}/stiffness/stiffness_history.npy')
+    env.save_stiffness_history(f"./data/{folder}/stiffness/stiffness_history.npy")
     env.save_actuator_forces(folder, seed_value)
     env.save_qpos_qvel(folder, seed_value)
     env.save_tendon_lengths(folder, seed_value)
-    env.save_tendon_forces( folder,seed_value )
-    
-    
-    # Evaluate
-    eval_env = make_env(0, config, seed_value)()
-    avg_eval_distance = evaluate_model(model, eval_env, num_episodes=10)
-    np.save(f'./data/{folder}/distance/eval_distance_seed_{seed_value}.npy', np.array(avg_eval_distance))
-    eval_env.close()
-    env.close()
+    env.save_tendon_forces(folder, seed_value)
+    print(f"Saved reward and displacement to ./data/{folder}/distance/")
 
-    aggregate_and_save_results(config)
+    try:
+        eval_env = make_env(0, config, seed_value)()
+        print(f"Eval env type: {type(eval_env)}")
+
+        avg_eval_distance = evaluate_model(model, eval_env, num_episodes=10)
+
+        eval_distance_path = os.path.join("./data", folder, "distance", f"eval_distance_seed_{seed_value}.npy")
+        np.save(eval_distance_path, np.array(avg_eval_distance))
+
+        eval_env.close()
+    except Exception as e:
+        print(f"⚠️ Evaluation or saving failed for seed {seed_value}: {e}")

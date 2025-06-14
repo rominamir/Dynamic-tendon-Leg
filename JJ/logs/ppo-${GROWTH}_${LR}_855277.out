@@ -1,0 +1,187 @@
+==========================================
+SLURM_JOB_ID = 855277
+SLURM_JOB_NODELIST = a01-01
+TMPDIR = /tmp/SLURM_855277
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+2025-06-13 13:39:24.545725: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py:150: UserWarning: You are trying to run PPO on the GPU, but it is primarily intended to run on the CPU when not using a CNN policy (you are using ActorCriticPolicy which should be a MlpPolicy). See https://github.com/DLR-RM/stable-baselines3/issues/1245 for more info. You can pass `device='cpu'` or `export CUDA_VISIBLE_DEVICES=` to force using the CPU.Note: The model will train, but the GPU utilization will be poor and the training might take longer than on CPU.
+  warnings.warn(
+🚀 Training | Seed=100 | Growth=constant_30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_log/LegEnv_Jun13_constant_30k_constant_5e-04_PPO_seeds_100-101/ppo/PPO_11
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 499      |
+| time/              |          |
+|    fps             | 1183     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 562          |
+| time/                   |              |
+|    fps                  | 934          |
+|    iterations           | 2            |
+|    time_elapsed         | 4            |
+|    total_timesteps      | 4096         |
+| train/                  |              |
+|    approx_kl            | 0.0074973325 |
+|    clip_fraction        | 0.114        |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | -0.0115      |
+|    learning_rate        | 0.0005       |
+|    loss                 | 8.21         |
+|    n_updates            | 10           |
+|    policy_gradient_loss | -0.0113      |
+|    std                  | 1            |
+|    value_loss           | 37.1         |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 619         |
+| time/                   |             |
+|    fps                  | 886         |
+|    iterations           | 3           |
+|    time_elapsed         | 6           |
+|    total_timesteps      | 6144        |
+| train/                  |             |
+|    approx_kl            | 0.009250108 |
+|    clip_fraction        | 0.0949      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.27       |
+|    explained_variance   | 0.0536      |
+|    learning_rate        | 0.0005      |
+|    loss                 | 15.3        |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.0106     |
+|    std                  | 1.01        |
+|    value_loss           | 39.1        |
+-----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 464         |
+| time/                   |             |
+|    fps                  | 864         |
+|    iterations           | 4           |
+|    time_elapsed         | 9           |
+|    total_timesteps      | 8192        |
+| train/                  |             |
+|    approx_kl            | 0.010774433 |
+|    clip_fraction        | 0.0873      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.28       |
+|    explained_variance   | 0.622       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 24.1        |
+|    n_updates            | 30          |
+|    policy_gradient_loss | -0.0108     |
+|    std                  | 1.01        |
+|    value_loss           | 64.1        |
+-----------------------------------------
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/glfw/__init__.py:917: GLFWError: (65550) b'Failed to detect any supported platform'
+  warnings.warn(message, GLFWError)
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/glfw/__init__.py:917: GLFWError: (65537) b'The GLFW library is not initialized'
+  warnings.warn(message, GLFWError)
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+Recording video for final episode (#10)
+❌ Failed training for Seed 100: an OpenGL platform library has not been loaded into this process, this most likely means that a valid OpenGL context has not been created before mjr_makeContext was called
+🚀 Training | Seed=101 | Growth=constant_30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_log/LegEnv_Jun13_constant_30k_constant_5e-04_PPO_seeds_100-101/ppo/PPO_12
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 31.6     |
+| time/              |          |
+|    fps             | 1175     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 271          |
+| time/                   |              |
+|    fps                  | 962          |
+|    iterations           | 2            |
+|    time_elapsed         | 4            |
+|    total_timesteps      | 4096         |
+| train/                  |              |
+|    approx_kl            | 0.0068127965 |
+|    clip_fraction        | 0.0591       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.0362       |
+|    learning_rate        | 0.0005       |
+|    loss                 | 23.9         |
+|    n_updates            | 10           |
+|    policy_gradient_loss | -0.00916     |
+|    std                  | 1            |
+|    value_loss           | 73           |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 327         |
+| time/                   |             |
+|    fps                  | 908         |
+|    iterations           | 3           |
+|    time_elapsed         | 6           |
+|    total_timesteps      | 6144        |
+| train/                  |             |
+|    approx_kl            | 0.011574349 |
+|    clip_fraction        | 0.124       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | 0.495       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 11.3        |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.0132     |
+|    std                  | 0.999       |
+|    value_loss           | 38.3        |
+-----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 413         |
+| time/                   |             |
+|    fps                  | 883         |
+|    iterations           | 4           |
+|    time_elapsed         | 9           |
+|    total_timesteps      | 8192        |
+| train/                  |             |
+|    approx_kl            | 0.006869282 |
+|    clip_fraction        | 0.0686      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | 0.684       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 19.4        |
+|    n_updates            | 30          |
+|    policy_gradient_loss | -0.00975    |
+|    std                  | 0.997       |
+|    value_loss           | 52.8        |
+-----------------------------------------
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+slurmstepd: error: *** JOB 855277 ON a01-01 CANCELLED AT 2025-06-14T12:13:29 ***

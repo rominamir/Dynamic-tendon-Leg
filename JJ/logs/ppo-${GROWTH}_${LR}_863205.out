@@ -1,0 +1,184 @@
+==========================================
+SLURM_JOB_ID = 863205
+SLURM_JOB_NODELIST = b02-01
+TMPDIR = /tmp/SLURM_863205
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+2025-06-14 11:45:43.196010: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py:150: UserWarning: You are trying to run PPO on the GPU, but it is primarily intended to run on the CPU when not using a CNN policy (you are using ActorCriticPolicy which should be a MlpPolicy). See https://github.com/DLR-RM/stable-baselines3/issues/1245 for more info. You can pass `device='cpu'` or `export CUDA_VISIBLE_DEVICES=` to force using the CPU.Note: The model will train, but the GPU utilization will be poor and the training might take longer than on CPU.
+  warnings.warn(
+🚀 Training | Seed=100 | Growth=constant:30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_log/LegEnv_Jun14_constant_30k_constant_5e-04_PPO_seeds_100-101/ppo/PPO_1
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 271      |
+| time/              |          |
+|    fps             | 1187     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 335         |
+| time/                   |             |
+|    fps                  | 938         |
+|    iterations           | 2           |
+|    time_elapsed         | 4           |
+|    total_timesteps      | 4096        |
+| train/                  |             |
+|    approx_kl            | 0.005818124 |
+|    clip_fraction        | 0.0469      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | -0.00927    |
+|    learning_rate        | 0.0005      |
+|    loss                 | 14.7        |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.00427    |
+|    std                  | 0.994       |
+|    value_loss           | 36.2        |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 344          |
+| time/                   |              |
+|    fps                  | 886          |
+|    iterations           | 3            |
+|    time_elapsed         | 6            |
+|    total_timesteps      | 6144         |
+| train/                  |              |
+|    approx_kl            | 0.0053794365 |
+|    clip_fraction        | 0.0437       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.23        |
+|    explained_variance   | 0.302        |
+|    learning_rate        | 0.0005       |
+|    loss                 | 19.3         |
+|    n_updates            | 20           |
+|    policy_gradient_loss | -0.00708     |
+|    std                  | 0.984        |
+|    value_loss           | 59.7         |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 318          |
+| time/                   |              |
+|    fps                  | 863          |
+|    iterations           | 4            |
+|    time_elapsed         | 9            |
+|    total_timesteps      | 8192         |
+| train/                  |              |
+|    approx_kl            | 0.0074050906 |
+|    clip_fraction        | 0.0848       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.22        |
+|    explained_variance   | 0.415        |
+|    learning_rate        | 0.0005       |
+|    loss                 | 25.7         |
+|    n_updates            | 30           |
+|    policy_gradient_loss | -0.0136      |
+|    std                  | 0.991        |
+|    value_loss           | 68.2         |
+------------------------------------------
+/home1/jiajinzh/.conda/envs/lab/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+Recording video for final episode (#10)
+❌ Failed training for Seed 100: 'NoneType' object has no attribute 'id'
+🚀 Training | Seed=101 | Growth=constant:30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_log/LegEnv_Jun14_constant_30k_constant_5e-04_PPO_seeds_100-101/ppo/PPO_2
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 393      |
+| time/              |          |
+|    fps             | 1229     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 347         |
+| time/                   |             |
+|    fps                  | 969         |
+|    iterations           | 2           |
+|    time_elapsed         | 4           |
+|    total_timesteps      | 4096        |
+| train/                  |             |
+|    approx_kl            | 0.010703948 |
+|    clip_fraction        | 0.101       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.23       |
+|    explained_variance   | 0.00564     |
+|    learning_rate        | 0.0005      |
+|    loss                 | 29.9        |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.0129     |
+|    std                  | 0.986       |
+|    value_loss           | 80.6        |
+-----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 339         |
+| time/                   |             |
+|    fps                  | 906         |
+|    iterations           | 3           |
+|    time_elapsed         | 6           |
+|    total_timesteps      | 6144        |
+| train/                  |             |
+|    approx_kl            | 0.008064593 |
+|    clip_fraction        | 0.0817      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.19       |
+|    explained_variance   | 0.315       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 41.5        |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.00853    |
+|    std                  | 0.973       |
+|    value_loss           | 77.1        |
+-----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 331         |
+| time/                   |             |
+|    fps                  | 877         |
+|    iterations           | 4           |
+|    time_elapsed         | 9           |
+|    total_timesteps      | 8192        |
+| train/                  |             |
+|    approx_kl            | 0.005161946 |
+|    clip_fraction        | 0.069       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.17       |
+|    explained_variance   | 0.402       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 35.9        |
+|    n_updates            | 30          |
+|    policy_gradient_loss | -0.00841    |
+|    std                  | 0.97        |
+|    value_loss           | 69.7        |
+-----------------------------------------
+Recording video for final episode (#10)
+❌ Failed training for Seed 101: 'NoneType' object has no attribute 'id'
+📊 Aggregating results from all seeds...
+✅ Aggregation complete.
