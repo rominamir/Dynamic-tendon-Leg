@@ -77,10 +77,10 @@ class TrainingConfig:
         self.stiffness_tag = f"constant_{int(self.stiffness_start/1000)}k"
 
     # -------------------- helpers --------------------
-    def folder_name(self) -> str:
-        date_tag = datetime.now().strftime('%b%d')
-        seeds_tag = f"seeds_{self.seed_start}-{self.seed_end}"
-        return f"LegEnv_{date_tag}_{self.stiffness_tag}_lr_{self.lr:.0e}_PPO_{seeds_tag}"
+	def folder_name(self) -> str:
+	    seeds_tag = f"seeds_{self.seed_start}-{self.seed_end}"
+	    return f"LegEnv_{self.run_date}_{self.stiffness_tag}_lr_{self.lr:.0e}_PPO_{seeds_tag}"
+
 
 # -----------------------------------------------------------------------------
 # Custom MuJoCo environment (constant stiffness only)
