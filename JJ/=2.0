@@ -1,0 +1,16 @@
+conda-forge/linux-64                                        Using cache
+conda-forge/noarch                                          Using cache
+Transaction
+
+  Prefix: /home1/jiajinzh/.conda/envs/lab_render
+
+  All requested packages already installed
+
+
+Looking for: ['shimmy']
+
+
+Pinned packages:
+  - python 3.9.*
+
+

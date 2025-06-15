@@ -1,0 +1,14 @@
+==========================================
+SLURM_JOB_ID = 864424
+SLURM_JOB_NODELIST = a01-06
+TMPDIR = /tmp/SLURM_864424
+==========================================
+🚀 Training | Seed=100 | constant stiffness | LR=5e-04
+❌ Failed training for Seed 100: Error: repeated name in camera array, position 1
+Object name = follow_leg, id = 1, line = 44, column = -1
+🚀 Training | Seed=101 | constant stiffness | LR=5e-04
+❌ Failed training for Seed 101: Error: repeated name in camera array, position 1
+Object name = follow_leg, id = 1, line = 44, column = -1
+✅ All seeds complete.
+✅ Aggregated rewards saved → ./data/aggregated_results/LegEnv_Jun14_constant_10k_lr_5e-04_PPO_seeds_100-101
+✅ Aggregated displacements saved → ./data/aggregated_results/LegEnv_Jun14_constant_10k_lr_5e-04_PPO_seeds_100-101

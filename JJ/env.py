@@ -1,97 +1,112 @@
 import os
-import numpy as np
 from datetime import datetime
+from typing import Optional
+
+import imageio
 import gym
-from gym import utils
 import mujoco
 import mujoco_env
-from stable_baselines3 import PPO, A2C
-from stable_baselines3.common.vec_env import SubprocVecEnv
+import numpy as np
+from gym import utils
+from stable_baselines3 import PPO
 
-# Learning rate scheduler
-def set_global_seeds(seed):
+"""Constant‑stiffness PPO environment & utilities (Python 3.8+ compatible).
+Folder names now embed the exact constant value, e.g. ``constant_10k``.
+"""
+
+# -----------------------------------------------------------------------------
+# Utilities
+# -----------------------------------------------------------------------------
+FIXED_GLOBAL_SEED = 404
+
+def set_global_seeds(seed: int) -> None:
+    """Ensure deterministic behaviour across NumPy / Python / Torch / CUDA."""
     import random
     import torch
+
     random.seed(seed)
     np.random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
-class LearningRateSchedule:
-    def __init__(self, schedule_type='constant', lr_start=3e-4, lr_end=1e-5, total_timesteps=1_000_000):
-        self.schedule_type = schedule_type
-        self.lr_start = lr_start
-        self.lr_end = lr_end
-        self.total_timesteps = total_timesteps
+set_global_seeds(FIXED_GLOBAL_SEED)
 
-    def __call__(self, progress_remaining):
-        if self.schedule_type == 'linear':
-            return self.lr_end + (self.lr_start - self.lr_end) * progress_remaining
-        elif self.schedule_type == 'constant':
-            return self.lr_start
-        else:
-            raise ValueError(f"Unsupported schedule type: {self.schedule_type}")
+class ConstantLR:
+    """Callable returning a fixed learning rate (for SB3 schedule API)."""
 
+    def __init__(self, lr: float = 3e-4):
+        self.lr = lr
+
+    def __call__(self, *_):
+        return self.lr
+
+
+# -----------------------------------------------------------------------------
 # Training configuration
+# -----------------------------------------------------------------------------
+
 class TrainingConfig:
-    def __init__(self,
-                 algorithm='PPO',
-                 growth_type='linear',
-                 growth_factor=3.0,
-                 stiffness_start=5000,
-                 stiffness_end=50000,
-                 num_seeds=10,
-                 total_timesteps=1_000_000,
-                 lr_schedule_type='linear',
-                 max_episode_steps=1000,
-                 lr_start=5e-4,
-                 lr_end=1e-5,
-                 n_envs=1):
-        self.algorithm = algorithm
-        self.growth_type = growth_type
-        self.growth_factor = growth_factor
+    """Hyper‑parameter container for constant‑stiffness PPO experiments."""
+
+    def __init__(
+        self,
+        stiffness_start: int = 5_000,
+        stiffness_end: int = 50_000,
+        num_seeds: int = 10,
+        total_timesteps: int = 1_000_000,
+        lr: float = 5e-4,
+        max_episode_steps: int = 1_000,
+        num_epochs: int = 1_000,
+        seed_start: int = 100,
+        seed_end: int = 124,
+    ) -> None:
+        self.algorithm = "PPO"
         self.stiffness_start = stiffness_start
         self.stiffness_end = stiffness_end
         self.num_seeds = num_seeds
         self.total_timesteps = total_timesteps
         self.max_episode_steps = max_episode_steps
-        self.lr_schedule_type = lr_schedule_type
-        self.lr_start = lr_start
-        self.lr_end = lr_end
-        self.n_envs = n_envs
-        self.run_date = datetime.now().strftime('%b%d')
+        self.num_epochs = num_epochs
+        self.lr = lr
+        self.run_date = datetime.now().strftime("%b%d")
+        self.seed_start = seed_start
+        self.seed_end = seed_end
+        self.lr_schedule = ConstantLR(lr)
+        self.stiffness_tag = f"constant_{int(self.stiffness_start/1000)}k"
 
-    def format_k(self, x):
-        return f"{int(x/1000)}k" if x % 1000 == 0 else str(x)
+    # -------------------- helpers --------------------
+    def folder_name(self) -> str:
+        date_tag = datetime.now().strftime('%b%d')
+        seeds_tag = f"seeds_{self.seed_start}-{self.seed_end}"
+        return f"LegEnv_{date_tag}_{self.stiffness_tag}_lr_{self.lr:.0e}_PPO_{seeds_tag}"
 
-    def folder_name(self):
-        date_tag = self.run_date 
-        lr_tag = f"{self.lr_schedule_type}_{self.lr_start:.0e}" if self.lr_schedule_type == 'constant' else f"{self.lr_schedule_type}_{self.lr_start:.0e}_to_{self.lr_end:.0e}"
-        seeds_tag = f"seeds_{100}-{100 + self.num_seeds - 1}"
-        safe_growth_type = self.growth_type.replace(':', '_')
-        return f"LegEnv_{date_tag}_{safe_growth_type}_{lr_tag}_{self.algorithm}_{seeds_tag}"
+# -----------------------------------------------------------------------------
+# Custom MuJoCo environment (constant stiffness only)
+# -----------------------------------------------------------------------------
 
-    def get_lr_schedule(self):
-        return LearningRateSchedule(
-            schedule_type=self.lr_schedule_type,
-            lr_start=self.lr_start,
-            lr_end=self.lr_end,
-            total_timesteps=self.total_timesteps
-        )
-
-# Custom Mujoco environment
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
     metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40}
 
-    def __init__(self, xml_file='leg.xml', render_mode='none', seed=None,
-                 stiffness_start=5000, stiffness_end=50000, num_epochs=1000,
-                 max_episode_steps=1000, growth_factor=0.03, growth_type='exponential'):
+    def __init__(
+        self,
+        xml_file: str = "leg.xml",
+        render_mode: Optional[str] = None,
+        seed: Optional[int] = None,
+        stiffness_start: int = 5_000,
+        stiffness_end: int = 50_000,
+        num_epochs: int = 1_000,
+        max_episode_steps: int = 1_000,
+    ) -> None:
+        # Action / observation spaces
         self.action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
         self.observation_space = gym.spaces.Box(low=-10, high=10, shape=(6,), dtype=np.float32)
+
         utils.EzPickle.__init__(self)
-        mujoco_env.MujocoEnv.__init__(self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space)
+        mujoco_env.MujocoEnv.__init__(
+            self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space
+        )
 
         if seed is not None:
             self.seed(seed)
@@ -100,62 +115,30 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.stiffness_end = stiffness_end
         self.num_epochs = num_epochs
         self.max_episode_steps = max_episode_steps
-        self.growth_factor = growth_factor
-        self.growth_type = growth_type
 
+        # Episode bookkeeping
         self.epoch_counter = 0
         self.steps_from_reset = 0
         self.global_step = 0
 
-        self.stiffness_scaling = self.stiffness_start
-        self.stiffness_history = []
-        self.reward_episode = 0
-        self.rewards = []
-        self.displacements = []
-        self.x_start = 0
+        # Data logging structures
+        self.stiffness_scaling = stiffness_start
+        self.stiffness_history: list[float] = []
+        self.reward_episode = 0.0
+        self.rewards: list[float] = []
+        self.displacements: list[float] = []
+        self.x_start = 0.0
 
-        self.actuator_force_history = []
-        self.actuator_forces_episode = []
-        self.qpos_episode = []
-        self.qvel_episode = []
-        self.qpos_history = []
-        self.qvel_history = []
-        self.tendon_forces_history = [] 
-        self.tendon_forces_episode = []
-        self.tendon_length_history = [] 
-        self.tendon_lengths_episode = []
+        # Apply initial constant stiffness
+        self._apply_stiffness(self.stiffness_scaling)
 
-        self.update_stiffness(self.epoch_counter)
-        self.seed_value = None
-        self.total_episodes_expected = None
-
-    def update_stiffness(self, epoch):
-        progress = epoch / max(1, self.num_epochs)
-        if self.growth_type == 'exponential':
-            exponent = self.growth_factor * progress
-            self.stiffness_scaling = self.stiffness_start + (
-                (self.stiffness_end - self.stiffness_start) * (np.exp(exponent) - 1) / (np.exp(self.growth_factor) - 1))
-        elif self.growth_type == 'logarithmic':
-            adjusted = 1 - np.exp(-self.growth_factor * progress)
-            self.stiffness_scaling = self.stiffness_start + (self.stiffness_end - self.stiffness_start) * adjusted
-        elif self.growth_type == 'linear':
-            self.stiffness_scaling = self.stiffness_start + progress * (self.stiffness_end - self.stiffness_start)
-        elif self.growth_type.startswith('constant_'):
-            self.stiffness_scaling = float(self.growth_type.split('_')[1].replace('k', '000'))
-        elif self.growth_type == 'curriculum_linear':
-            if progress <= 0.25:
-                self.stiffness_scaling = self.stiffness_start
-            else:
-                lin_progress = (progress - 0.25) / 0.75
-                self.stiffness_scaling = self.stiffness_start + lin_progress * (self.stiffness_end - self.stiffness_start)
-        self.stiffness_scaling = min(self.stiffness_scaling, self.stiffness_end)
-        self.apply_stiffness(self.stiffness_scaling)
-        self.stiffness_history.append(self.stiffness_scaling)
-
-    def apply_stiffness(self, value):
+    # -------------------- MuJoCo helpers --------------------
+    def _apply_stiffness(self, value: float) -> None:
         for i in range(len(self.model.tendon_stiffness)):
             self.model.tendon_stiffness[i] = value
+        self.stiffness_history.append(value)
 
+    # -------------------- RL loop --------------------
     def step(self, action):
         x_before = self.data.qpos[0]
         self.do_simulation(action, self.frame_skip)
@@ -164,12 +147,6 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         reward = max(velocity, 0) - max(-velocity, 0)
 
         self.reward_episode += reward
-
-        self.qpos_episode.append(self.data.qpos.copy())
-        self.qvel_episode.append(self.data.qvel.copy())
-        self.tendon_lengths_episode.append(self.data.ten_length.copy())
-        self.actuator_forces_episode.append(self.data.actuator_force.copy())
-
         self.steps_from_reset += 1
         self.global_step += 1
 
@@ -177,248 +154,192 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         if done:
             self.rewards.append(self.reward_episode)
             self.displacements.append(x_after - self.x_start)
-            self.reward_episode = 0
-
-            self.actuator_force_history.append(self.actuator_forces_episode)
-            self.actuator_forces_episode = []
-            self.qpos_history.append(self.qpos_episode)
-            self.qvel_history.append(self.qvel_episode)
-            self.qpos_episode = []
-            self.qvel_episode = []
-            self.tendon_length_history.append(self.tendon_lengths_episode)
-            self.tendon_forces_history.append(self.tendon_forces_episode)
-            self.tendon_lengths_episode = []
-            self.tendon_forces_episode = []   
+            self.reward_episode = 0.0
+            self.steps_from_reset = 0
 
         return self.get_obs(), reward, done, False, {}
 
-    def set_state(self, qpos, qvel):
-        assert hasattr(self, 'model') and hasattr(self, 'data'), "model/data not initialized"
-        assert qpos.shape == (self.model.nq,)
-        assert qvel.shape == (self.model.nv,)
-
-        self.data.qpos[:] = qpos
-        self.data.qvel[:] = qvel
-
-        try:
-            mujoco.mj_forward(self.model, self.data)
-        except Exception as e:
-            print("mj_forward failed:", e)
-            raise
-
     def reset_model(self):
-        self.steps_from_reset = 0
         self.epoch_counter += 1
-        self.update_stiffness(self.epoch_counter)
-        self.reward_episode = 0
 
-        initial_qpos = np.zeros(self.model.nq)
-        initial_qvel = np.zeros(self.model.nv)
-        self.set_state(initial_qpos, initial_qvel)
+        # Hard reset to zero state
+        self.data.qpos[:] = 0.0
+        self.data.qvel[:] = 0.0
+        mujoco.mj_forward(self.model, self.data)
 
         self.x_start = self.data.qpos[0]
-
-        self.actuator_forces_episode = []
-        self.qpos_episode = []
-        self.qvel_episode = []
-        self.tendon_lengths_episode = []
-        self.tendon_forces_episode = []
-
         return self.get_obs()
 
     def get_obs(self):
         return np.concatenate((self.data.qpos.flat.copy(), self.data.qvel.flat.copy())).ravel()
 
-    def get_position(self):
-        return self.data.qpos[0]
-
-    def seed(self, seed=None):
+    def seed(self, seed: Optional[int] = None):
         np.random.seed(seed)
         self.action_space.seed(seed)
         self.observation_space.seed(seed)
 
-    def save_reward_and_displacement(self, folder, seed):
-        print(f"Saved reward: {self.rewards[:5]}... length={len(self.rewards)}")
-        base = f'./data/{folder}/distance'
-        os.makedirs(base, exist_ok=True)
-        np.save(f'{base}/reward_history_seed_{seed}.npy', np.array(self.rewards))
-        np.save(f'{base}/displacement_history_seed_{seed}.npy', np.array(self.displacements))
+    def viewer_setup(self):
+        cam_id = mujoco.mj_name2id(self.model,
+                                mujoco.mjtObj.mjOBJ_CAMERA,
+                                "follow_leg")
+        self.viewer.cam.fixedcamid = cam_id
+        self.viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
+        pass 
+    def render(self, mode=None, *args, **kwargs):
+        if self.viewer is not None:
+            chassis_pos = self.data.body('Chassis').xpos
+            self.viewer.cam.lookat[:] = chassis_pos
+        try:
+            return super().render(*args, **kwargs)
+        except TypeError as e:
+            return super().render()
 
-    def save_stiffness_history(self, filename):
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        np.save(filename, np.array(self.stiffness_history))
 
-    def save_actuator_forces(self, folder, seed):
-        base = f'./data/{folder}/actuator_forces'
-        os.makedirs(base, exist_ok=True)
-        np.save(f'{base}/actuator_forces_seed_{seed}.npy', np.array(self.actuator_force_history, dtype=object))
+            
 
-    def save_qpos_qvel(self, folder, seed):
-        base = f'./data/{folder}/kinematics'
-        os.makedirs(base, exist_ok=True)
-        np.save(f'{base}/qpos_seed_{seed}.npy', np.array(self.qpos_history, dtype=object))
-        np.save(f'{base}/qvel_seed_{seed}.npy', np.array(self.qvel_history, dtype=object))
 
-    def save_tendon_lengths(self, folder, seed):
-        base = f'./data/{folder}/tendon_lengths'
-        os.makedirs(base, exist_ok=True)
-        np.save(f'{base}/tendon_lengths_seed_{seed}.npy', np.array(self.tendon_length_history, dtype=object))
-    
-    def save_tendon_forces(self, folder, seed):
-        base = f'./data/{folder}/tendon_forces'
-        os.makedirs(base, exist_ok=True)
-        np.save(f'{base}/tendon_forces_seed_{seed}.npy', np.array(self.tendon_forces_history, dtype=object))
+# -----------------------------------------------------------------------------
+# Training loop
+# -----------------------------------------------------------------------------
 
-# Model evaluation
-def evaluate_model(model, env, num_episodes=10):
-    distances = []
-    for _ in range(num_episodes):
-        obs, _ = env.reset()
-        done = False
-        x_start = env.get_position()
-        while not done:
-            action, _ = model.predict(obs, deterministic=True)
-            obs, _, done, _, _ = env.step(action)
-        x_end = env.get_position()
-        distances.append(x_end - x_start)
-    return np.mean(distances)
+def train(config: TrainingConfig, seed: int) -> None:
+    """
+    Train a single PPO agent with the given random seed, save all artefacts, and
+    (optionally) record a short demo video.
 
-# Aggregate results for multiple seeds
-def aggregate_and_save_results(config: TrainingConfig):
-    folder = config.folder_name()
-    rewards, displacements = [], []
-    for i in range(config.num_seeds):
-        r_path = f'./data/{folder}/distance/reward_history_seed_{100 + i}.npy'
-        d_path = f'./data/{folder}/distance/displacement_history_seed_{100 + i}.npy'
-        if os.path.exists(r_path):
-            rewards.append(np.load(r_path))
-        if os.path.exists(d_path):
-            displacements.append(np.load(d_path))
+    Parameters
+    ----------
+    config : TrainingConfig
+        Experiment-wide hyper-parameters and I/O conventions.
+    seed : int
+        Random seed used for the SB3 model, Gym spaces and NumPy RNGs.
+    """
+    # ---------------------------------------------------------------------- #
+    # 0) I/O setup                                                           #
+    # ---------------------------------------------------------------------- #
+    folder    = config.folder_name()             # e.g. LegEnv_Jun14_constant_10k_lr_5e-04_PPO_seeds_100-124
+    tag       = config.stiffness_tag            # e.g. constant_10k
+    save_path = f"./data/{folder}"
+    os.makedirs(save_path, exist_ok=True)
 
-    save_dir = f'./data/aggregated_results/{folder}/'
-    os.makedirs(save_dir, exist_ok=True)
-
-    growth_tag = config.growth_type.replace(':', '_')
-
-    if rewards:
-        min_len = min(len(r) for r in rewards)
-        rewards_trimmed = np.array([r[:min_len] for r in rewards])
-        reward_mean = np.mean(rewards_trimmed, axis=0)
-        reward_se = np.std(rewards_trimmed, axis=0, ddof=1) / np.sqrt(len(rewards))
-        np.save(os.path.join(save_dir, f'reward_mean_{growth_tag}.npy'), reward_mean)
-        np.save(os.path.join(save_dir, f'reward_se_{growth_tag}.npy'), reward_se)
-        print(f"Saved aggregated reward mean and SE at {save_dir} with growth type '{growth_tag}'")
-
-    if displacements:
-        min_len = min(len(d) for d in displacements)
-        displacements_trimmed = np.array([d[:min_len] for d in displacements])
-        displacement_mean = np.mean(displacements_trimmed, axis=0)
-        displacement_se = np.std(displacements_trimmed, axis=0, ddof=1) / np.sqrt(len(displacements))
-        np.save(os.path.join(save_dir, f'displacement_mean_{growth_tag}.npy'), displacement_mean)
-        np.save(os.path.join(save_dir, f'displacement_se_{growth_tag}.npy'), displacement_se)
-        print(f"Saved aggregated displacement mean and SE at {save_dir} with growth type '{growth_tag}'")
-
-# Factory function for parallel environment creation
-def make_env(seed_offset, config, seed_value):
-    def _init():
-        print("🔧 Creating LegEnvBase...")
-        is_slurm = "SLURM_JOB_ID" in os.environ
-        render_mode = None if is_slurm else "rgb_array"
-        
-        env = LegEnvBase(
-            render_mode=render_mode,
-            growth_factor=config.growth_factor,
-            growth_type=config.growth_type,
-            stiffness_start=config.stiffness_start,
-            stiffness_end=config.stiffness_end
-        )
-
-        if env is None:
-            raise RuntimeError("❌ Failed to create environment!")
-
-        print("✅ Created LegEnvBase:", type(env))
-
-        full_seed = seed_value + seed_offset
-        env.seed(full_seed)
-        env.action_space.seed(full_seed)
-        env.observation_space.seed(full_seed)
-
-        return env
-    return _init
-
-# Training with parallel environments
-def train_env(seed_value, config: TrainingConfig):
-    folder = config.folder_name()
-    os.makedirs(f"./tensorboard_log/{folder}/model/", exist_ok=True)
-    os.makedirs(f"./data/{folder}/distance/", exist_ok=True)
-    os.makedirs(f"./data/{folder}/stiffness/", exist_ok=True)
-
-    fix_seed_value = 404
-    set_global_seeds(fix_seed_value)
-
-    total_episodes = config.total_timesteps // config.max_episode_steps
-    is_slurm = "SLURM_JOB_ID" in os.environ
-    render_mode = None if is_slurm else "rgb_array"
-
+    # ---------------------------------------------------------------------- #
+    # 1) Create training environment (headless for speed)                    #
+    # ---------------------------------------------------------------------- #
     env = LegEnvBase(
-        render_mode=render_mode,
-        growth_factor=config.growth_factor,
-        growth_type=config.growth_type,
+        render_mode=None,                        # headless → no RGB overhead on cluster
         stiffness_start=config.stiffness_start,
         stiffness_end=config.stiffness_end,
-        num_epochs=total_episodes,
-        max_episode_steps=config.max_episode_steps
+        num_epochs=config.num_epochs,
+        max_episode_steps=config.max_episode_steps,
     )
-    env.total_episodes_expected = total_episodes
-    env.seed_value = seed_value
-    env.seed(fix_seed_value)
+    env.seed(seed)
 
-    lr_schedule = config.get_lr_schedule()
-
-    if config.algorithm == 'PPO':
-        model = PPO(
-            'MlpPolicy',
-            env,
-            verbose=1,
-            seed=seed_value,
-            tensorboard_log=f"./tensorboard_log/{folder}/ppo",
-            learning_rate=lr_schedule,
-            normalize_advantage=True
-        )
-    elif config.algorithm == 'A2C':
-        model = A2C(
-            'MlpPolicy',
-            env,
-            verbose=1,
-            seed=seed_value,
-            tensorboard_log=f"./tensorboard_log/{folder}/a2c",
-            learning_rate=lr_schedule
-        )
-    else:
-        raise ValueError("Unsupported algorithm. Choose between 'PPO' and 'A2C'.")
+    # ---------------------------------------------------------------------- #
+    # 2) Instantiate PPO and start learning                                  #
+    # ---------------------------------------------------------------------- #
+    model = PPO(
+        "MlpPolicy",
+        env,
+        learning_rate=config.lr,                # constant LR
+        seed=seed,
+        verbose=1,
+        tensorboard_log=f"./tensorboard_logs/{folder}/",
+    )
 
     model.learn(total_timesteps=config.total_timesteps)
-    final_model_path = f"./data/{folder}/final_model_seed_{seed_value}.zip"
-    model.save(final_model_path)
-    print(f"Model saved at: {final_model_path}")
 
-    env.save_reward_and_displacement(folder, seed_value)
-    env.save_stiffness_history(f"./data/{folder}/stiffness/stiffness_history.npy")
-    env.save_actuator_forces(folder, seed_value)
-    env.save_qpos_qvel(folder, seed_value)
-    env.save_tendon_lengths(folder, seed_value)
-    env.save_tendon_forces(folder, seed_value)
-    print(f"Saved reward and displacement to ./data/{folder}/distance/")
+    # ---------------------------------------------------------------------- #
+    # 3) Persist artefacts                                                   #
+    # ---------------------------------------------------------------------- #
+    model.save(f"{save_path}/model_{tag}_seed_{seed}")  # .zip added by SB3
 
+    # episode-level histories
+    np.save(f"{save_path}/rewards_{tag}_seed_{seed}.npy",       env.rewards)
+    np.save(f"{save_path}/displacements_{tag}_seed_{seed}.npy", env.displacements)
+    np.save(f"{save_path}/stiffness_{tag}_seed_{seed}.npy",     env.stiffness_history)
+
+    # ---------------------------------------------------------------------- #
+    # 4) Record a short demo video (optional)                                #
+    #    Gracefully skip if GL/EGL unavailable on the node.                  #
+    # ---------------------------------------------------------------------- #
     try:
-        eval_env = make_env(0, config, seed_value)()
-        print(f"Eval env type: {type(eval_env)}")
+        video_file = f"{save_path}/final_episode_{tag}_seed_{seed}.mp4"
+        _record_final_episode_video(config, model, seed, video_file)
+    except Exception as exc:
+        print(f"[warn] video capture failed for seed {seed}: {exc}")
 
-        avg_eval_distance = evaluate_model(model, eval_env, num_episodes=10)
+    env.close()
 
-        eval_distance_path = os.path.join("./data", folder, "distance", f"eval_distance_seed_{seed_value}.npy")
-        np.save(eval_distance_path, np.array(avg_eval_distance))
 
-        eval_env.close()
-    except Exception as e:
-        print(f"⚠️ Evaluation or saving failed for seed {seed_value}: {e}")
+
+def _record_final_episode_video(
+    config: TrainingConfig, model, seed: int, outfile: str, max_frames: int = 1_000
+) -> None:
+    """Run one episode in an RGB-array env and save it as an MP4."""
+    env = LegEnvBase(
+        render_mode="rgb_array",
+        stiffness_start=config.stiffness_start,
+        stiffness_end=config.stiffness_end,
+        num_epochs=1,
+        max_episode_steps=config.max_episode_steps,
+    )
+    env.seed(seed)
+    _ = env.render()
+    env.viewer_setup()
+
+    obs, _ = env.reset()
+    frames = []
+    done = False
+    steps = 0
+    while not done and steps < max_frames:
+        action, _ = model.predict(obs, deterministic=True)
+        obs, _, done, _, _ = env.step(action)
+        # cam_id = mujoco.mj_name2id(env.model, mujoco.mjtObj.mjOBJ_CAMERA, "follow_leg")
+        frame = env.render()
+        if frame is not None:
+            frames.append(frame)
+        steps += 1
+
+    env.close()
+
+    if not frames:
+        raise RuntimeError("env.render() returned no frames — cannot save video")
+
+    imageio.mimsave(outfile, frames, fps=60)
+    print(f"[video] saved → {outfile}")
+
+
+def aggregate_and_save_results(config: TrainingConfig) -> None:
+    """Aggregate reward/displacement across seeds and save mean & SE."""
+    folder = config.folder_name()
+    tag = config.stiffness_tag
+    save_dir = f'./data/aggregated_results/{folder}'
+    os.makedirs(save_dir, exist_ok=True)
+
+    reward_list, disp_list = [], []
+
+    for seed in range(config.seed_start, config.seed_end + 1):
+        r_path = f'./data/{folder}/rewards_{tag}_seed_{seed}.npy'
+        d_path = f'./data/{folder}/displacements_{tag}_seed_{seed}.npy'
+        if os.path.isfile(r_path):
+            reward_list.append(np.load(r_path))
+        if os.path.isfile(d_path):
+            disp_list.append(np.load(d_path))
+
+    # Reward
+    if reward_list:
+        min_len = min(len(r) for r in reward_list)
+        rewards = np.stack([r[:min_len] for r in reward_list])
+        np.save(f"{save_dir}/reward_mean_{tag}.npy", rewards.mean(axis=0))
+        np.save(f"{save_dir}/reward_se_{tag}.npy",
+                rewards.std(axis=0, ddof=1) / np.sqrt(rewards.shape[0]))
+        print(f"✅ Aggregated rewards saved → {save_dir}")
+
+    # Displacement
+    if disp_list:
+        min_len = min(len(d) for d in disp_list)
+        disps = np.stack([d[:min_len] for d in disp_list])
+        np.save(f"{save_dir}/displacement_mean_{tag}.npy", disps.mean(axis=0))
+        np.save(f"{save_dir}/displacement_se_{tag}.npy",
+                disps.std(axis=0, ddof=1) / np.sqrt(disps.shape[0]))
+        print(f"✅ Aggregated displacements saved → {save_dir}")

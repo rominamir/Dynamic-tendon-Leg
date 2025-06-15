@@ -1,0 +1,33 @@
+==========================================
+SLURM_JOB_ID = 863720
+SLURM_JOB_NODELIST = b04-13
+TMPDIR = /tmp/SLURM_863720
+==========================================
+no change     /apps/conda/miniforge3/24.3.0/condabin/conda
+no change     /apps/conda/miniforge3/24.3.0/bin/conda
+no change     /apps/conda/miniforge3/24.3.0/bin/conda-env
+no change     /apps/conda/miniforge3/24.3.0/bin/activate
+no change     /apps/conda/miniforge3/24.3.0/bin/deactivate
+no change     /apps/conda/miniforge3/24.3.0/etc/profile.d/conda.sh
+no change     /apps/conda/miniforge3/24.3.0/etc/fish/conf.d/conda.fish
+no change     /apps/conda/miniforge3/24.3.0/shell/condabin/Conda.psm1
+no change     /apps/conda/miniforge3/24.3.0/shell/condabin/conda-hook.ps1
+no change     /apps/conda/miniforge3/24.3.0/lib/python3.10/site-packages/xontrib/conda.xsh
+no change     /apps/conda/miniforge3/24.3.0/etc/profile.d/conda.csh
+modified      /home1/jiajinzh/.bashrc
+
+==> For changes to take effect, close and re-open your current shell. <==
+
+
+CondaError: Run 'conda init' before 'conda activate'
+
+Python version: 3.10.17 | packaged by conda-forge | (main, Apr 10 2025, 22:19:12) [GCC 13.3.0]
+MuJoCo version: 3.2.7
+Renderer setting: egl
+XML file found: /home1/jiajinzh/Dynamic-tendon-Leg/JJ/assets/leg.xml
+Attempting to create environment with rgb_array rendering...
+Failed to initialize environment: []
+Rendering failed: []
+Retrying with MUJOCO_GL=osmesa...
+Failed to initialize environment: []
+Rendering failed with osmesa: []

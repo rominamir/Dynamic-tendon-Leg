@@ -1,0 +1,10 @@
+==========================================
+SLURM_JOB_ID = 864204
+SLURM_JOB_NODELIST = a01-06
+TMPDIR = /tmp/SLURM_864204
+==========================================
+🚀 Training | Seed=100 | constant stiffness | LR=5e-04
+❌ Failed training for Seed 100: 'TrainingConfig' object has no attribute 'seed_end'
+🚀 Training | Seed=101 | constant stiffness | LR=5e-04
+❌ Failed training for Seed 101: 'TrainingConfig' object has no attribute 'seed_end'
+✅ All seeds complete.

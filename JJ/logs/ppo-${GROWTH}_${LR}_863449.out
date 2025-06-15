@@ -1,0 +1,18 @@
+==========================================
+SLURM_JOB_ID = 863449
+SLURM_JOB_NODELIST = a01-20
+TMPDIR = /tmp/SLURM_863449
+==========================================
+
+CondaError: Run 'conda init' before 'conda activate'
+
+Python version: 3.10.17 | packaged by conda-forge | (main, Apr 10 2025, 22:19:12) [GCC 13.3.0]
+MuJoCo version: 3.2.7
+Renderer setting: egl
+XML file found: /home1/jiajinzh/Dynamic-tendon-Leg/JJ/assets/leg.xml
+Attempting to create environment with rgb_array rendering...
+Failed to initialize environment: []
+Rendering failed: []
+Retrying with MUJOCO_GL=osmesa...
+Failed to initialize environment: []
+Rendering failed with osmesa: []

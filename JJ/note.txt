@@ -1,2 +1,6 @@
 June3 changed timestep in Mujoco to 0.002
 June12 failed to save the training data
+June14 created a new mamba env lab_render, modified the env.py, 
+	deleted A2C and other non-related growth_types. make_env()is not using anywhere so also got deleted.
+	python downgraded to 3.9 to have a better support iof Video recording.
+	camera updated....finally, 8 hrs of work :)

@@ -1,0 +1,228 @@
+==========================================
+SLURM_JOB_ID = 863942
+SLURM_JOB_NODELIST = b04-13
+TMPDIR = /tmp/SLURM_863942
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/on_policy_algorithm.py:150: UserWarning: You are trying to run PPO on the GPU, but it is primarily intended to run on the CPU when not using a CNN policy (you are using ActorCriticPolicy which should be a MlpPolicy). See https://github.com/DLR-RM/stable-baselines3/issues/1245 for more info. You can pass `device='cpu'` or `export CUDA_VISIBLE_DEVICES=` to force using the CPU.Note: The model will train, but the GPU utilization will be poor and the training might take longer than on CPU.
+  warnings.warn(
+🚀 Training | Seed=100 | Growth=constant:30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_logs/LegEnv_Jun14_constant:30k_constant_5e-04_PPO_seeds_100-100/PPO_1
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 271      |
+| time/              |          |
+|    fps             | 936      |
+|    iterations      | 1        |
+|    time_elapsed    | 2        |
+|    total_timesteps | 2048     |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 335         |
+| time/                   |             |
+|    fps                  | 762         |
+|    iterations           | 2           |
+|    time_elapsed         | 5           |
+|    total_timesteps      | 4096        |
+| train/                  |             |
+|    approx_kl            | 0.005818121 |
+|    clip_fraction        | 0.0469      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | -0.00927    |
+|    learning_rate        | 0.0005      |
+|    loss                 | 14.7        |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.00427    |
+|    std                  | 0.994       |
+|    value_loss           | 36.2        |
+-----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 344         |
+| time/                   |             |
+|    fps                  | 771         |
+|    iterations           | 3           |
+|    time_elapsed         | 7           |
+|    total_timesteps      | 6144        |
+| train/                  |             |
+|    approx_kl            | 0.005379439 |
+|    clip_fraction        | 0.0437      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.23       |
+|    explained_variance   | 0.302       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 19.3        |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.00708    |
+|    std                  | 0.984       |
+|    value_loss           | 59.7        |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 317          |
+| time/                   |              |
+|    fps                  | 776          |
+|    iterations           | 4            |
+|    time_elapsed         | 10           |
+|    total_timesteps      | 8192         |
+| train/                  |              |
+|    approx_kl            | 0.0074051507 |
+|    clip_fraction        | 0.0848       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.22        |
+|    explained_variance   | 0.415        |
+|    learning_rate        | 0.0005       |
+|    loss                 | 25.7         |
+|    n_updates            | 30           |
+|    policy_gradient_loss | -0.0136      |
+|    std                  | 0.991        |
+|    value_loss           | 68.2         |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 325          |
+| time/                   |              |
+|    fps                  | 778          |
+|    iterations           | 5            |
+|    time_elapsed         | 13           |
+|    total_timesteps      | 10240        |
+| train/                  |              |
+|    approx_kl            | 0.0052611865 |
+|    clip_fraction        | 0.026        |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.21        |
+|    explained_variance   | 0.36         |
+|    learning_rate        | 0.0005       |
+|    loss                 | 24.5         |
+|    n_updates            | 40           |
+|    policy_gradient_loss | -0.00514     |
+|    std                  | 0.978        |
+|    value_loss           | 62.4         |
+------------------------------------------
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/on_policy_algorithm.py:150: UserWarning: You are trying to run PPO on the GPU, but it is primarily intended to run on the CPU when not using a CNN policy (you are using ActorCriticPolicy which should be a MlpPolicy). See https://github.com/DLR-RM/stable-baselines3/issues/1245 for more info. You can pass `device='cpu'` or `export CUDA_VISIBLE_DEVICES=` to force using the CPU.Note: The model will train, but the GPU utilization will be poor and the training might take longer than on CPU.
+  warnings.warn(
+❌ Failed training for Seed 100: 'LegEnvBase' object has no attribute 'tendon_force_history'
+🚀 Training | Seed=101 | Growth=constant:30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_logs/LegEnv_Jun14_constant:30k_constant_5e-04_PPO_seeds_100-100/PPO_2
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 395      |
+| time/              |          |
+|    fps             | 1227     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 2048     |
+---------------------------------
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 1e+03      |
+|    ep_rew_mean          | 368        |
+| time/                   |            |
+|    fps                  | 961        |
+|    iterations           | 2          |
+|    time_elapsed         | 4          |
+|    total_timesteps      | 4096       |
+| train/                  |            |
+|    approx_kl            | 0.01091536 |
+|    clip_fraction        | 0.106      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.23      |
+|    explained_variance   | 0.0057     |
+|    learning_rate        | 0.0005     |
+|    loss                 | 29.8       |
+|    n_updates            | 10         |
+|    policy_gradient_loss | -0.0129    |
+|    std                  | 0.987      |
+|    value_loss           | 81.2       |
+----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 362         |
+| time/                   |             |
+|    fps                  | 896         |
+|    iterations           | 3           |
+|    time_elapsed         | 6           |
+|    total_timesteps      | 6144        |
+| train/                  |             |
+|    approx_kl            | 0.008102894 |
+|    clip_fraction        | 0.0756      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.19       |
+|    explained_variance   | 0.313       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 45.9        |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.00941    |
+|    std                  | 0.972       |
+|    value_loss           | 78.8        |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1e+03        |
+|    ep_rew_mean          | 348          |
+| time/                   |              |
+|    fps                  | 867          |
+|    iterations           | 4            |
+|    time_elapsed         | 9            |
+|    total_timesteps      | 8192         |
+| train/                  |              |
+|    approx_kl            | 0.0060000964 |
+|    clip_fraction        | 0.066        |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.16        |
+|    explained_variance   | 0.37         |
+|    learning_rate        | 0.0005       |
+|    loss                 | 38.9         |
+|    n_updates            | 30           |
+|    policy_gradient_loss | -0.00786     |
+|    std                  | 0.963        |
+|    value_loss           | 80.1         |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 1e+03       |
+|    ep_rew_mean          | 371         |
+| time/                   |             |
+|    fps                  | 851         |
+|    iterations           | 5           |
+|    time_elapsed         | 12          |
+|    total_timesteps      | 10240       |
+| train/                  |             |
+|    approx_kl            | 0.010346923 |
+|    clip_fraction        | 0.0779      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.13       |
+|    explained_variance   | 0.417       |
+|    learning_rate        | 0.0005      |
+|    loss                 | 21.2        |
+|    n_updates            | 40          |
+|    policy_gradient_loss | -0.00659    |
+|    std                  | 0.954       |
+|    value_loss           | 65.8        |
+-----------------------------------------
+❌ Failed training for Seed 101: 'LegEnvBase' object has no attribute 'tendon_force_history'
+📊 Aggregating results from all seeds...
+Saved aggregated reward mean and SE at ./data/aggregated_results/LegEnv_Jun14_constant_30k_constant_5e-04_PPO_seeds_100-101/ with growth type 'constant_30k'
+Saved aggregated displacement mean and SE at ./data/aggregated_results/LegEnv_Jun14_constant_30k_constant_5e-04_PPO_seeds_100-101/ with growth type 'constant_30k'
+✅ Aggregation complete.

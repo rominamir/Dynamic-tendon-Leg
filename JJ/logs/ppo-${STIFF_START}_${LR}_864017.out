@@ -1,0 +1,9 @@
+==========================================
+SLURM_JOB_ID = 864017
+SLURM_JOB_NODELIST = a01-06
+TMPDIR = /tmp/SLURM_864017
+==========================================
+Traceback (most recent call last):
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/train.py", line 12, in <module>
+    from leg_training_constant import TrainingConfig, train  # Rename if your file/module differs.
+ModuleNotFoundError: No module named 'leg_training_constant'

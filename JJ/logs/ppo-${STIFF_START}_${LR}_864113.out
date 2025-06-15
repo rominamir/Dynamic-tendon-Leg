@@ -1,0 +1,13 @@
+==========================================
+SLURM_JOB_ID = 864113
+SLURM_JOB_NODELIST = a01-06
+TMPDIR = /tmp/SLURM_864113
+==========================================
+Traceback (most recent call last):
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/train.py", line 12, in <module>
+    from env import TrainingConfig, train  # Rename if your file/module differs.
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 86, in <module>
+    class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/env.py", line 92, in LegEnvBase
+    render_mode: str | None = None,
+TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'

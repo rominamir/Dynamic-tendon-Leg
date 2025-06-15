@@ -1,0 +1,22 @@
+==========================================
+SLURM_JOB_ID = 864310
+SLURM_JOB_NODELIST = a01-06
+TMPDIR = /tmp/SLURM_864310
+==========================================
+🚀 Training | Seed=100 | constant stiffness | LR=5e-04
+❌ Failed training for Seed 100: XML Error: Schema violation: unrecognized attribute: 'body'
+
+Element 'camera', line 38
+
+🚀 Training | Seed=101 | constant stiffness | LR=5e-04
+❌ Failed training for Seed 101: XML Error: Schema violation: unrecognized attribute: 'body'
+
+Element 'camera', line 38
+
+✅ All seeds complete.
+Traceback (most recent call last):
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/train.py", line 49, in <module>
+    main()
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/train.py", line 45, in main
+    aggregate_and_save_results(config)
+NameError: name 'config' is not defined

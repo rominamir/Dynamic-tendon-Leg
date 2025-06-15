@@ -33,13 +33,14 @@
 
     <worldbody>
         <geom name="floor" pos="0 0 -0.5" size="0 0 1" type="plane" material="matplane"/>
-
+        <camera name="follow_leg"
+                pos="0 2 1"
+                euler="0 0 90"
+                target="Chassis"
+                mode="track"/>
         <light directional="true" diffuse=".8 .8 .8" specular=".2 .2 .2" pos="0 0 5" dir="0 1 -5"/>
         <body name="Chassis" pos="0 0 -.05">
-            <camera name="Chassis_camera" pos="0 -6 3"  zaxis="0 -2 1"/>
-          
-
-
+        
             <geom name="Chassis_frame" type="box" pos="0 0 1.7" zaxis="0 1 0" size=".50 .30 .25" rgba=".25 .25 .25 0.25" mass=".1"/>
 
            <joint armature="0"  axis="1 0 0" damping="0" frictionloss="30" limited="false" name="rootx" pos="0 0 0" stiffness="0" type="slide" ref = "0"/>
@@ -62,7 +63,7 @@
 
                 <site name="S_L0_2" pos="-0.1 0 -.25" size="0.02"/>
                 <site name="S_L0_3" pos=" 0.00 0 -.25" size="0.02"/>
-                <site name="S_L_04" pos="+0.1 0 -.25" size="0.02"/>
+                <site name="S_L0_4" pos="+0.1 0 -.25" size="0.02"/>
 
                 <body pos="0 0 -.5">
                     <joint name="Knee" range="-90 0" ref="-45"/>

@@ -1,0 +1,28 @@
+==========================================
+SLURM_JOB_ID = 863937
+SLURM_JOB_NODELIST = b04-13
+TMPDIR = /tmp/SLURM_863937
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/on_policy_algorithm.py:150: UserWarning: You are trying to run PPO on the GPU, but it is primarily intended to run on the CPU when not using a CNN policy (you are using ActorCriticPolicy which should be a MlpPolicy). See https://github.com/DLR-RM/stable-baselines3/issues/1245 for more info. You can pass `device='cpu'` or `export CUDA_VISIBLE_DEVICES=` to force using the CPU.Note: The model will train, but the GPU utilization will be poor and the training might take longer than on CPU.
+  warnings.warn(
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+🚀 Training | Seed=100 | Growth=constant:30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+❌ Failed training for Seed 100: Trying to log data to tensorboard but tensorboard is not installed.
+🚀 Training | Seed=101 | Growth=constant:30k | LR=constant
+Using cuda device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+❌ Failed training for Seed 101: Trying to log data to tensorboard but tensorboard is not installed.
+📊 Aggregating results from all seeds...
+Saved aggregated reward mean and SE at ./data/aggregated_results/LegEnv_Jun14_constant_30k_constant_5e-04_PPO_seeds_100-101/ with growth type 'constant_30k'
+Saved aggregated displacement mean and SE at ./data/aggregated_results/LegEnv_Jun14_constant_30k_constant_5e-04_PPO_seeds_100-101/ with growth type 'constant_30k'
+✅ Aggregation complete.

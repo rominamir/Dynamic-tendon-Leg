@@ -1,0 +1,12 @@
+==========================================
+SLURM_JOB_ID = 863900
+SLURM_JOB_NODELIST = b04-13
+TMPDIR = /tmp/SLURM_863900
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+  File "/home1/jiajinzh/Dynamic-tendon-Leg/JJ/train.py", line 27
+    seed_start=args.seed_start,
+    ^
+SyntaxError: invalid syntax

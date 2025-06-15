@@ -1,0 +1,14 @@
+==========================================
+SLURM_JOB_ID = 863835
+SLURM_JOB_NODELIST = b04-13
+TMPDIR = /tmp/SLURM_863835
+==========================================
+Run 'mamba init' to be able to run mamba activate/deactivate
+and start a new shell session. Or use conda to activate/deactivate.
+
+🚀 Training | Seed=100 | Growth=constant:10k | LR=constant
+❌ Failed training for Seed 100: 'TrainingConfig' object has no attribute 'learning_rate'
+🚀 Training | Seed=101 | Growth=constant:10k | LR=constant
+❌ Failed training for Seed 101: 'TrainingConfig' object has no attribute 'learning_rate'
+📊 Aggregating results from all seeds...
+✅ Aggregation complete.

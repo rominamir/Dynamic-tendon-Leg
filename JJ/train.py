@@ -1,45 +1,50 @@
-import argparse
-from env import train_env, TrainingConfig, aggregate_and_save_results
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
+"""Entry‑point script aligned with the streamlined constant‑growth PPO setup.
 
-def main():
+Usage (example):
+    python train.py --lr 5e-4 --seed_start 100 --seed_end 109 --total_timesteps 100000
+"""
+
+import argparse
+import sys
+
+# Import your environment/training utilities.
+# Make sure the module name matches the cleaned file you saved earlier.
+from env import TrainingConfig, train, aggregate_and_save_results # Rename if your file/module differs.
+
+sys.stdout.reconfigure(encoding="utf-8")
+
+def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--growth_type', type=str, required=True)
-    parser.add_argument('--lr_schedule_type', type=str, required=True)
-    parser.add_argument('--seed_start', type=int, default=100)
-    parser.add_argument('--seed_end', type=int, default=109)
-    parser.add_argument('--total_timesteps', type=int, default=100000)
+    parser.add_argument("--lr", type=float, default=5e-4, help="Constant learning rate for PPO")
+    parser.add_argument("--seed_start", type=int, default=100)
+    parser.add_argument("--seed_end", type=int, default=109)
+    parser.add_argument("--total_timesteps", type=int, default=100_000)
+    parser.add_argument("--stiffness_start", type=int, default=5_000)
+    parser.add_argument("--stiffness_end", type=int, default=50_000)
     args = parser.parse_args()
 
-    # Create shared config once
-    config = TrainingConfig(
-        algorithm="PPO",
-        growth_type=args.growth_type,
-        growth_factor=3.0,
-        stiffness_start=5000,
-        stiffness_end=50000,
-        num_seeds=(args.seed_end - args.seed_start + 1),
-        lr_schedule_type=args.lr_schedule_type,
-        lr_start=5e-4,
-        lr_end=1e-5,
-        total_timesteps=args.total_timesteps
+    # Shared configuration (one object reused across seeds)
+    cfg = TrainingConfig(
+        stiffness_start=args.stiffness_start,
+        stiffness_end=args.stiffness_end,
+        num_seeds=args.seed_end - args.seed_start + 1,
+        total_timesteps=args.total_timesteps,
+        lr=args.lr,
+        seed_start=args.seed_start,
+        seed_end=args.seed_end
     )
 
     for seed in range(args.seed_start, args.seed_end + 1):
-        print(f"🚀 Training | Seed={seed} | Growth={args.growth_type} | LR={args.lr_schedule_type}")
-
+        print(f"🚀 Training | Seed={seed} | constant stiffness | LR={args.lr:.0e}")
         try:
-            train_env(seed_value=seed, config=config)
+            train(cfg, seed)
             print(f"✅ Finished training for Seed {seed}")
+        except Exception as exc:
+            print(f"❌ Failed training for Seed {seed}: {exc}")
 
-        except Exception as e:
-            print(f"❌ Failed training for Seed {seed}: {e}")
+    print("✅ All seeds complete.")
+    aggregate_and_save_results(cfg)
 
-    # Perform aggregation after all seeds are done
-    print("📊 Aggregating results from all seeds...")
-    aggregate_and_save_results(config)
-    print("✅ Aggregation complete.")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
