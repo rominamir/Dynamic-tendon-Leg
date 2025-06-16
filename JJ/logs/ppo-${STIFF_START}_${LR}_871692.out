@@ -1,0 +1,46 @@
+==========================================
+SLURM_JOB_ID = 871692
+SLURM_JOB_NODELIST = b05-14
+TMPDIR = /tmp/SLURM_871692
+==========================================
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+🚀 Training | Seed=100 | constant stiffness | LR=5e-04
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_logs/LegEnv_Jun16_constant_5k_lr_5e-04_PPO_seeds_100-101/PPO_12
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 245      |
+| time/              |          |
+|    fps             | 2479     |
+|    iterations      | 1        |
+|    time_elapsed    | 0        |
+|    total_timesteps | 2048     |
+---------------------------------
+/home1/jiajinzh/.conda/envs/lab_render/lib/python3.9/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+[video] saved → ./data/LegEnv_Jun16_constant_5k_lr_5e-04_PPO_seeds_100-101/final_episode_constant_5k_seed_100.mp4
+✅ Finished training for Seed 100
+🚀 Training | Seed=101 | constant stiffness | LR=5e-04
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./tensorboard_logs/LegEnv_Jun16_constant_5k_lr_5e-04_PPO_seeds_100-101/PPO_13
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 1e+03    |
+|    ep_rew_mean     | 237      |
+| time/              |          |
+|    fps             | 2601     |
+|    iterations      | 1        |
+|    time_elapsed    | 0        |
+|    total_timesteps | 2048     |
+---------------------------------
+[video] saved → ./data/LegEnv_Jun16_constant_5k_lr_5e-04_PPO_seeds_100-101/final_episode_constant_5k_seed_101.mp4
+✅ Finished training for Seed 101
+✅ All seeds complete.
+✅ Aggregated rewards saved → ./data/aggregated_results/LegEnv_Jun16_constant_5k_lr_5e-04_PPO_seeds_100-101
+✅ Aggregated displacements saved → ./data/aggregated_results/LegEnv_Jun16_constant_5k_lr_5e-04_PPO_seeds_100-101

@@ -48,8 +48,10 @@ class ConstantLR:
 # -----------------------------------------------------------------------------
 
 class TrainingConfig:
-    """Hyper‑parameter container for constant‑stiffness PPO experiments."""
-
+    """
+    Hyper-parameter container for constant-stiffness PPO experiments.
+    Now supports fixed run_date for consistent folder naming.
+    """
     def __init__(
         self,
         stiffness_start: int = 5_000,
@@ -61,6 +63,7 @@ class TrainingConfig:
         num_epochs: int = 1_000,
         seed_start: int = 100,
         seed_end: int = 124,
+        run_date: str = None   # New: allow passing a fixed run_date
     ) -> None:
         self.algorithm = "PPO"
         self.stiffness_start = stiffness_start
@@ -70,16 +73,19 @@ class TrainingConfig:
         self.max_episode_steps = max_episode_steps
         self.num_epochs = num_epochs
         self.lr = lr
-        self.run_date = datetime.now().strftime("%b%d")
+        # Use passed run_date if provided, otherwise use current date
+        if run_date is None:
+            self.run_date = datetime.now().strftime("%b%d")
+        else:
+            self.run_date = run_date
         self.seed_start = seed_start
         self.seed_end = seed_end
         self.lr_schedule = ConstantLR(lr)
         self.stiffness_tag = f"constant_{int(self.stiffness_start/1000)}k"
 
-    # -------------------- helpers --------------------
-	def folder_name(self) -> str:
-	    seeds_tag = f"seeds_{self.seed_start}-{self.seed_end}"
-	    return f"LegEnv_{self.run_date}_{self.stiffness_tag}_lr_{self.lr:.0e}_PPO_{seeds_tag}"
+    def folder_name(self) -> str:
+        seeds_tag = f"seeds_{self.seed_start}-{self.seed_end}"
+        return f"LegEnv_{self.run_date}_{self.stiffness_tag}_lr_{self.lr:.0e}_PPO_{seeds_tag}"
 
 
 # -----------------------------------------------------------------------------
@@ -129,6 +135,17 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.displacements: list[float] = []
         self.x_start = 0.0
 
+        # Additional episode-level data
+        self.qpos_episode = []
+        self.qvel_episode = []
+        self.actuator_forces_episode = []
+        self.tendon_lengths_episode = []
+
+        self.qpos_history = []
+        self.qvel_history = []
+        self.actuator_force_history = []
+        self.tendon_lengths_history = []
+
         # Apply initial constant stiffness
         self._apply_stiffness(self.stiffness_scaling)
 
@@ -147,12 +164,31 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         reward = max(velocity, 0) - max(-velocity, 0)
 
         self.reward_episode += reward
+
+        # Log per-step data
+        self.qpos_episode.append(self.data.qpos.copy())
+        self.qvel_episode.append(self.data.qvel.copy())
+        self.tendon_lengths_episode.append(self.data.ten_length.copy())
+        self.actuator_forces_episode.append(self.data.actuator_force.copy())
         self.steps_from_reset += 1
         self.global_step += 1
 
         done = self.steps_from_reset >= self.max_episode_steps
         if done:
             self.rewards.append(self.reward_episode)
+
+            # Save episode-level data
+            self.qpos_history.append(self.qpos_episode)
+            self.qvel_history.append(self.qvel_episode)
+            self.tendon_lengths_history.append(self.tendon_lengths_episode)
+            self.actuator_force_history.append(self.actuator_forces_episode)
+
+            # Reset per-episode storage
+            self.qpos_episode = []
+            self.qvel_episode = []
+            self.tendon_lengths_episode = []
+            self.actuator_forces_episode = []
+
             self.displacements.append(x_after - self.x_start)
             self.reward_episode = 0.0
             self.steps_from_reset = 0
@@ -204,29 +240,33 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
 def train(config: TrainingConfig, seed: int) -> None:
     """
-    Train a single PPO agent with the given random seed, save all artefacts, and
-    (optionally) record a short demo video.
-
-    Parameters
-    ----------
-    config : TrainingConfig
-        Experiment-wide hyper-parameters and I/O conventions.
-    seed : int
-        Random seed used for the SB3 model, Gym spaces and NumPy RNGs.
+    Train PPO agent with given seed, save model and all data in categorized subfolders.
     """
-    # ---------------------------------------------------------------------- #
-    # 0) I/O setup                                                           #
-    # ---------------------------------------------------------------------- #
-    folder    = config.folder_name()             # e.g. LegEnv_Jun14_constant_10k_lr_5e-04_PPO_seeds_100-124
-    tag       = config.stiffness_tag            # e.g. constant_10k
+    # ---------- Setup save folders ----------
+    folder    = config.folder_name()
+    tag       = config.stiffness_tag
     save_path = f"./data/{folder}"
     os.makedirs(save_path, exist_ok=True)
 
-    # ---------------------------------------------------------------------- #
-    # 1) Create training environment (headless for speed)                    #
-    # ---------------------------------------------------------------------- #
+    # Create subfolders
+    model_dir = os.path.join(save_path, "model")
+    rewards_dir = os.path.join(save_path, "rewards")
+    disp_dir = os.path.join(save_path, "displacements")
+    stiffness_dir = os.path.join(save_path, "stiffness")
+    kinematic_dir = os.path.join(save_path, "kinematics")
+    actuator_force_dir = os.path.join(save_path, "actuator_forces")
+    tendon_length_dir = os.path.join(save_path, "tendon_lengths")
+    os.makedirs(model_dir, exist_ok=True)
+    os.makedirs(rewards_dir, exist_ok=True)
+    os.makedirs(disp_dir, exist_ok=True)
+    os.makedirs(stiffness_dir, exist_ok=True)
+    os.makedirs(kinematic_dir, exist_ok=True)
+    os.makedirs(actuator_force_dir, exist_ok=True)
+    os.makedirs(tendon_length_dir, exist_ok=True)
+
+    # ---------- Create environment ----------
     env = LegEnvBase(
-        render_mode=None,                        # headless → no RGB overhead on cluster
+        render_mode=None,
         stiffness_start=config.stiffness_start,
         stiffness_end=config.stiffness_end,
         num_epochs=config.num_epochs,
@@ -234,34 +274,33 @@ def train(config: TrainingConfig, seed: int) -> None:
     )
     env.seed(seed)
 
-    # ---------------------------------------------------------------------- #
-    # 2) Instantiate PPO and start learning                                  #
-    # ---------------------------------------------------------------------- #
+    # ---------- Setup PPO and train ----------
     model = PPO(
         "MlpPolicy",
         env,
-        learning_rate=config.lr,                # constant LR
+        learning_rate=config.lr,
         seed=seed,
         verbose=1,
         tensorboard_log=f"./tensorboard_logs/{folder}/",
+        device='cpu'
     )
 
     model.learn(total_timesteps=config.total_timesteps)
 
-    # ---------------------------------------------------------------------- #
-    # 3) Persist artefacts                                                   #
-    # ---------------------------------------------------------------------- #
-    model.save(f"{save_path}/model_{tag}_seed_{seed}")  # .zip added by SB3
+    # ---------- Save model and data ----------
+    model.save(f"{model_dir}/model_{tag}_seed_{seed}")
 
-    # episode-level histories
-    np.save(f"{save_path}/rewards_{tag}_seed_{seed}.npy",       env.rewards)
-    np.save(f"{save_path}/displacements_{tag}_seed_{seed}.npy", env.displacements)
-    np.save(f"{save_path}/stiffness_{tag}_seed_{seed}.npy",     env.stiffness_history)
+    np.save(f"{rewards_dir}/rewards_{tag}_seed_{seed}.npy", env.rewards)
+    np.save(f"{disp_dir}/displacements_{tag}_seed_{seed}.npy", env.displacements)
+    np.save(f"{stiffness_dir}/stiffness_{tag}_seed_{seed}.npy", env.stiffness_history)
 
-    # ---------------------------------------------------------------------- #
-    # 4) Record a short demo video (optional)                                #
-    #    Gracefully skip if GL/EGL unavailable on the node.                  #
-    # ---------------------------------------------------------------------- #
+    np.save(f"{kinematic_dir}/qpos_{tag}_seed_{seed}.npy", np.array(env.qpos_history, dtype=object))
+    np.save(f"{kinematic_dir}/qvel_{tag}_seed_{seed}.npy", np.array(env.qvel_history, dtype=object))
+
+    np.save(f'{actuator_force_dir}/actuator_forces_{tag}_seed_{seed}.npy', np.array(env.actuator_force_history, dtype=object))
+    np.save(f"{tendon_length_dir}/tendon_length_{tag}_seed_{seed}.npy", np.array(env.tendon_lengths_history, dtype=object))
+
+    # ---------- Record demo video (optional) ----------
     try:
         video_file = f"{save_path}/final_episode_{tag}_seed_{seed}.mp4"
         _record_final_episode_video(config, model, seed, video_file)
@@ -269,6 +308,7 @@ def train(config: TrainingConfig, seed: int) -> None:
         print(f"[warn] video capture failed for seed {seed}: {exc}")
 
     env.close()
+
 
 
 
@@ -318,9 +358,13 @@ def aggregate_and_save_results(config: TrainingConfig) -> None:
 
     reward_list, disp_list = [], []
 
+    # Use new subfolders for each file type
+    rewards_dir = f'./data/{folder}/rewards'
+    disp_dir = f'./data/{folder}/displacements'
+
     for seed in range(config.seed_start, config.seed_end + 1):
-        r_path = f'./data/{folder}/rewards_{tag}_seed_{seed}.npy'
-        d_path = f'./data/{folder}/displacements_{tag}_seed_{seed}.npy'
+        r_path = f'{rewards_dir}/rewards_{tag}_seed_{seed}.npy'
+        d_path = f'{disp_dir}/displacements_{tag}_seed_{seed}.npy'
         if os.path.isfile(r_path):
             reward_list.append(np.load(r_path))
         if os.path.isfile(d_path):
