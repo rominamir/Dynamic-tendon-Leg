@@ -28,6 +28,8 @@ module load cuda/12.6.3
 # (Assumes mamba/conda is available via module or profile)
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate lab_render
+export MUJOCO_GL=egl
+
 
 # --- Variables ------------------------------------------------------
 LR=$1

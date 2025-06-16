@@ -6,6 +6,8 @@ Usage (example):
 
 import argparse
 import sys
+from datetime import datetime
+
 
 # Import your environment/training utilities.
 # Make sure the module name matches the cleaned file you saved earlier.
@@ -23,6 +25,9 @@ def main() -> None:
     parser.add_argument("--stiffness_end", type=int, default=50_000)
     args = parser.parse_args()
 
+    run_date = datetime.now().strftime("%b%d")
+
+
     # Shared configuration (one object reused across seeds)
     cfg = TrainingConfig(
         stiffness_start=args.stiffness_start,
@@ -31,7 +36,8 @@ def main() -> None:
         total_timesteps=args.total_timesteps,
         lr=args.lr,
         seed_start=args.seed_start,
-        seed_end=args.seed_end
+        seed_end=args.seed_end,
+        run_date=run_date
     )
 
     for seed in range(args.seed_start, args.seed_end + 1):
