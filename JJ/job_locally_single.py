@@ -3,7 +3,7 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-growth_type =  "constant_30k"           # e.g., "curriculum_linear", "constant:30k"
+growth_type =  "constant_20k"           # e.g., "curriculum_linear", "constant:30k"
 lr_schedule_type = "constant"      # e.g., "constant" or "linear"
 job_tag = "test_forces"          # tag output folders
 train_script = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\Dynamic-tendon-Leg\JJ\train.py"

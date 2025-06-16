@@ -140,13 +140,13 @@ def plot_subplots(groups, group_seeds, colors, window_size):
 
             ax.plot(episodes, smoothed_mean, color=colors[idx], linestyle='-')
             ax.fill_between(episodes, smoothed_mean - smoothed_std, smoothed_mean + smoothed_std, color=colors[idx], alpha=0.2)
+            
+            label = label.replace("Constant", "").strip()
             ax.set_title(label)
 
             # Show ticks/labels only on bottom-left subplot (index 8)
-            if idx == 8:
-                ax.set_xlabel("Episode")
-                ax.set_ylabel("Displacement (m)")
-            else:
+            if idx != 8:
+   
                 ax.tick_params(labelbottom=False, labelleft=False)
                 ax.set_xlabel("")
                 ax.set_ylabel("")
@@ -156,6 +156,9 @@ def plot_subplots(groups, group_seeds, colors, window_size):
         else:
             ax.set_title(f"{label} (No data)")
             ax.axis('off')
+                 
+    fig.supxlabel("Episode", fontsize=16)
+    fig.supylabel("Displacement (m)", fontsize=16)
 
     # Hide any unused subplots (in case fewer than 10 groups)
     for extra_ax in axs[num_groups:]:
@@ -217,19 +220,24 @@ def plot_all_subplots(groups, group_seeds, colors, window_size):
                 print(f"Warning: {file_path} not found.")
 
         if plotted:
+            label = label.replace("Constant", "").strip()
             ax.set_title(label)
             ax.set_ylim(global_ymin, global_ymax)
             ax.grid(True)
-            if idx == 8:
-                ax.set_xlabel("Episode")
-                ax.set_ylabel("Displacement (m)")
-            else:
+            if idx != 8:
+                #ax.set_xlabel("Episode")
+                #ax.set_ylabel("Displacement (m)")
+    
                 ax.tick_params(labelbottom=False, labelleft=False)
                 ax.set_xlabel("")
                 ax.set_ylabel("")
         else:
+            
             ax.set_title(f"{label} (No data)")
             ax.axis('off')
+       
+        fig.supxlabel("Episode", fontsize=16)
+        fig.supylabel("Displacement (m)", fontsize=16)
 
     # Hide any unused subplots
     for extra_ax in axs[num_groups:]:
@@ -237,14 +245,14 @@ def plot_all_subplots(groups, group_seeds, colors, window_size):
 
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     fig.subplots_adjust(hspace=0.4, wspace=0.01)
-    fig.suptitle("Displacement across different tendon stiffnesses", fontsize=22)
+    fig.suptitle("Displacement across different tendon stiffnesses [N/m]", fontsize=22)
     plt.show()
 
 # ======================
 # MAIN EXECUTION SECTION
 # ======================
 if __name__ == "__main__":
-    mode = "all"  # Change to "combined" or "subplots" or "all"
+    mode = "subplots"  # Change to "combined" or "subplots" or "all"
 
     if mode == "combined":
         plot_combined(groups, group_seeds, colors, window_size)

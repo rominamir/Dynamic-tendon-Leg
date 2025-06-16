@@ -5,10 +5,11 @@ from matplotlib import cm
 import re
 
 # Define folder and seeds
-folder = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\data\LegEnv_Jun11_constant_30k_constant_5e-04_PPO_seeds_100-100"
+# "C:\Users\User\Desktop\Dynamic-tendon-Leg\data\LegEnv_Jun11_constant_20k_constant_5e-04_PPO_seeds_100-100"
+folder = r"C:\Users\User\Desktop\Dynamic-tendon-Leg\Dynamic-tendon-Leg\JJ\data\LegEnv_Jun14_constant_20k_lr_5e-04_PPO_seeds_100-124"
 #seeds = [113, 114, 115, 116, 117, 118]  # Example seeds
+# seeds = [10, 101, 102, 103, 104, 105]  # Example seeds
 seeds = [100, 101, 102, 103, 104, 105]  # Example seeds
-#seeds = [110, 111, 112, 113, 114, 118]  # Example seeds
 
 
 

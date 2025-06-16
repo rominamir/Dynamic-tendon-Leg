@@ -14,33 +14,33 @@ model_xml = """
     </body>
 
     <!-- 10 kg mass hanging below -->
-    <body name="weight" pos="0 0 -0.1">
+    <body name="weight" pos="0 0 -1">
       <joint name="free" type="free"/>
-      <geom type="sphere" size="0.03" mass="10"/>
+      <geom type="sphere" size="0.03" mass="0.6"/>
       <site name="mass_site" pos="0 0 0" size="0.005" />
     </body>
   </worldbody>
 
   <tendon>
-    <spatial name="spring_tendon" stiffness="2000" springlength="0.02">
+    <spatial name="spring_tendon" stiffness="30000" >
       <site site="anchor_site"/>
       <site site="mass_site"/>
     </spatial>
   </tendon>
 
-  <actuator>
-    <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
-  </actuator>
+  <-- <actuator>
+     <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
+    </actuator> --!>
 </mujoco>
 """
 
-'''
+
 model = mujoco.MjModel.from_xml_string(model_xml)
 data = mujoco.MjData(model)
 
 tendon_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TENDON, "spring_tendon")
-rest_length = 0.2
-stiffness = 2000
+rest_length = 1
+stiffness = 30000
 
 sim_time = 2.0
 dt = model.opt.timestep
@@ -57,7 +57,7 @@ for i in range(n_steps):
 
 plt.figure(figsize=(8, 5))
 plt.plot(times, lengths, label="Tendon Length")
-plt.axhline(y=0.2, color='gray', linestyle='--', label="Rest Length (0.2m)")
+plt.axhline(y=2, color='gray', linestyle='--', label="Rest Length (0.2m)")
 plt.axhline(y=0.22, color='red', linestyle='--', label="Target Length (0.22m)")
 plt.xlabel("Time (s)")
 plt.ylabel("Tendon Length (m)")
@@ -100,7 +100,7 @@ plt.grid(True)
 plt.legend()
 plt.tight_layout()
 plt.show()
-'''
+
 
 import mujoco
 import numpy as np
@@ -114,7 +114,7 @@ tendon_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TENDON, "spring_tendon"
 actuator_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, "muscle_force")
 
 # Simulation config
-sim_time = 2.0
+sim_time = 10
 dt = model.opt.timestep
 n_steps = int(sim_time / dt)
 
@@ -136,11 +136,12 @@ for i in range(n_steps):
     lengths.append(length)
 
 
-    print(f"Tendon length at t={i*dt:.3f}: {length:.4f}")
+    #print(f"Tendon length at t={i*dt:.3f}: {length:.4f}")
     # Manual spring force (passive)
-    rest_length = 0.02
+    rest_length = 1
 
-    spring_force = model.tendon_stiffness[tendon_id] * max(0.0, length - rest_length)
+    spring_force = model.tendon_stiffness[tendon_id] *( length - rest_length)
+
 
     manual_forces.append(spring_force)
 
@@ -149,8 +150,7 @@ for i in range(n_steps):
     actuator_forces.append(actuator_force)
 
     times.append(i * dt)
-
-# Plotting
+"otting"
 plt.figure(figsize=(10, 6))
 plt.plot(times, manual_forces, label="Manual Tendon Spring Force (N)")
 plt.plot(times, actuator_forces, label="Actuator (Muscle) Force (N)", linestyle="--")

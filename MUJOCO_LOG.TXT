@@ -4,3 +4,135 @@ WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Ti
 Thu Jun  5 17:26:58 2025
 WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.7250.
 
+Thu Jun 12 19:55:01 2025
+WARNING: mju_openResource: unknown file '
+<mujoco model="tendon_stretch_test">
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <worldbody>
+    <!-- Fixed anchor -->
+    <body name="anchor" pos="0 0 0">
+      <geom type="sphere" size="0.01" rgba="1 0 0 1"/>
+      <site name="anchor_site" pos="0 0 0" size="0.005" />
+    </body>
+
+    <!-- 10 kg mass hanging below -->
+    <body name="weight" pos="0 0 -1">
+      <joint name="free" type="free"/>
+      <geom type="sphere" size="0.03" mass="0.6"/>
+      <site name="mass_site" pos="0 0 0" size="0.005" />
+    </body>
+  </worldbody>
+
+  <tendon>
+    <spatial name="spring_tendon" stiffness="30000" >
+      <site site="anchor_site"/>
+      <site site="mass_site"/>
+    </spatial>
+  </tendon>
+
+  <-- <actuator>
+     <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
+    </actuator> --!>
+</mujoco>
+'
+
+Thu Jun 12 19:55:10 2025
+WARNING: mju_openResource: unknown file '
+<mujoco model="tendon_stretch_test">
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <worldbody>
+    <!-- Fixed anchor -->
+    <body name="anchor" pos="0 0 0">
+      <geom type="sphere" size="0.01" rgba="1 0 0 1"/>
+      <site name="anchor_site" pos="0 0 0" size="0.005" />
+    </body>
+
+    <!-- 10 kg mass hanging below -->
+    <body name="weight" pos="0 0 -1">
+      <joint name="free" type="free"/>
+      <geom type="sphere" size="0.03" mass="0.6"/>
+      <site name="mass_site" pos="0 0 0" size="0.005" />
+    </body>
+  </worldbody>
+
+  <tendon>
+    <spatial name="spring_tendon" stiffness="30000" >
+      <site site="anchor_site"/>
+      <site site="mass_site"/>
+    </spatial>
+  </tendon>
+
+  <-- <actuator>
+     <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
+    </actuator> --!>
+</mujoco>
+'
+
+Thu Jun 12 20:04:25 2025
+WARNING: mju_openResource: unknown file '
+<mujoco model="tendon_stretch_test">
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <worldbody>
+    <!-- Fixed anchor -->
+    <body name="anchor" pos="0 0 0">
+      <geom type="sphere" size="0.01" rgba="1 0 0 1"/>
+      <site name="anchor_site" pos="0 0 0" size="0.005" />
+    </body>
+
+    <!-- 10 kg mass hanging below -->
+    <body name="weight" pos="0 0 -1">
+      <joint name="free" type="free"/>
+      <geom type="sphere" size="0.03" mass="0.6"/>
+      <site name="mass_site" pos="0 0 0" size="0.005" />
+    </body>
+  </worldbody>
+
+  <tendon>
+    <spatial name="spring_tendon" stiffness="30000" >
+      <site site="anchor_site"/>
+      <site site="mass_site"/>
+    </spatial>
+  </tendon>
+
+  <-- <actuator>
+     <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
+    </actuator> --!>
+</mujoco>
+'
+
+Thu Jun 12 20:11:16 2025
+WARNING: mju_openResource: unknown file '
+<mujoco model="tendon_stretch_test">
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+
+  <worldbody>
+    <!-- Fixed anchor -->
+    <body name="anchor" pos="0 0 0">
+      <geom type="sphere" size="0.01" rgba="1 0 0 1"/>
+      <site name="anchor_site" pos="0 0 0" size="0.005" />
+    </body>
+
+    <!-- 10 kg mass hanging below -->
+    <body name="weight" pos="0 0 -1">
+      <joint name="free" type="free"/>
+      <geom type="sphere" size="0.03" mass="0.6"/>
+      <site name="mass_site" pos="0 0 0" size="0.005" />
+    </body>
+  </worldbody>
+
+  <tendon>
+    <spatial name="spring_tendon" stiffness="30000" >
+      <site site="anchor_site"/>
+      <site site="mass_site"/>
+    </spatial>
+  </tendon>
+
+  <-- <actuator>
+     <muscle name="muscle_force" tendon="spring_tendon" ctrlrange="0 1" force="5000" lengthrange="0.1 0.3"/>
+    </actuator> --!>
+</mujoco>
+'
+
