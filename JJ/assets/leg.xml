@@ -18,8 +18,14 @@
 
     <default>
         <joint type="hinge" pos="0 0 0" axis="0 1 0" limited="true" damping="1" frictionloss="3" />
-        <tendon stiffness = "1000" damping = "100"/>
-        <muscle ctrllimited="true" ctrlrange="0 1" force="6000"/>
+        <tendon stiffness = "3000" damping = "10"/>
+        <!-- default muscle  -->
+        <!-- <muscle ctrllimited="true" ctrlrange="0 1" force="6000" gear="1"/> -->
+        <!-- <muscle ctrllimited="true" ctrlrange="0 1" force="200" forcerange="0 500" gear="10"/> -->
+        <!-- <motor gear="-400" ctrlrange="0 1" forcerange="0 200"/> -->
+        <motor gear="-400" ctrlrange="0 1" forcerange="0 200"/>
+
+
     </default>
 
 
@@ -107,10 +113,17 @@
 
     </tendon>
 
-    <actuator>
+    <actuator>  
+       <motor name="T_M0_motor" tendon="T_M0"  />
+        <motor name="T_M1_motor" tendon="T_M1"  />
+        <motor name="T_M2_motor" tendon="T_M2"  />  
+
+    </actuator>  
+
+    <!-- <actuator>
         <muscle name="T_M0" tendon="T_M0"/>
         <muscle name="T_M1" tendon="T_M1"/>
         <muscle name="T_M2" tendon="T_M2"/>
-    </actuator>
+    </actuator> -->
 
 </mujoco>
