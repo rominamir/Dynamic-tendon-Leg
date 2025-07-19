@@ -81,6 +81,11 @@ class TrainingConfig:
         self.num_epochs = num_epochs
         self.lr = lr
 
+
+
+        self.prev_actuator_force = None
+        self.prev_qpos = None
+
         # Use passed run_date if provided, otherwise use current date
         if run_date is None:
             self.run_date = datetime.now().strftime("%b%d")
@@ -107,7 +112,7 @@ class TrainingConfig:
 # -----------------------------------------------------------------------------
 
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
-    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40} #40
+    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 20} #40 with frame_skip 5 
 
     def __init__(
         self,
@@ -125,8 +130,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(
-            self, xml_file, 5, render_mode=render_mode, observation_space=self.observation_space
-        )
+            self, xml_file, 10 , render_mode=render_mode, observation_space=self.observation_space
+        )## frame skip was 5 now changing it to 10
 
         if seed is not None:
             self.seed(seed)
@@ -164,7 +169,15 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.actuator_force_history = []
         self.tendon_lengths_history = []
 
+
+        self.activation = np.zeros(self.model.nu)
+        self.smooth_weight = 0.01  # or lower
+        self.use_tau_after = 100_000
+        self.step_counter=0
+        self.tau = 1.0
         # Apply initial constant stiffness
+        self.filtered_action = None
+
         self._apply_stiffness(self.stiffness_scaling)
 
     # -------------------- MuJoCo helpers --------------------
@@ -175,15 +188,77 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
     # -------------------- RL loop --------------------
     def step(self, action):
+        self.step_counter += 1
+
+
         x_before = self.data.qpos[0]
-        # print(f"[Action] {action}")
-        
+
+
+
+        # # Smooth action: low-pass filter to simulate actuator lag
+        # alpha = 0.9  # closer to 1 = slower response
+        # if self.filtered_action is None:
+        #     self.filtered_action = action.copy()
+        # else:
+        #     self.filtered_action = alpha * self.filtered_action + (1 - alpha) * action
+
+        # self.do_simulation(self.filtered_action, self.frame_skip)
+
+        # Apply control using standard method
         self.do_simulation(action, self.frame_skip)
+
+        
+
+       
         x_after = self.data.qpos[0]
-        velocity = (x_after - x_before) / self.dt
-        reward = max(velocity, 0) - max(-velocity, 0)
+        velocity = (x_after - x_before) / (self.dt * self.frame_skip)
+
+        # Reward logic (example)
+        reward = 1000 * velocity 
+        reward += 10 * np.sum(np.abs(self.data.qvel[1:]))
+
+        # Optional: smoothness penalty
+        # if self.step_counter >= self.use_tau_after:
+        #     smooth_penalty = np.sum(np.abs(ctrl - target_ctrls))
+        #     reward -= self.smooth_weight * smooth_penalty
+
+
+            
+        print("qpos:", self.data.qpos)
+        print("qvel:", self.data.qvel)
+        # print("tendon_force:", self.data.tendon_force)
+        print("ctrl:", self.data.ctrl)
+
+        print('reward', reward)
+        # Get current actuator forces and joint angles
+        actuator_force = self.data.actuator_force.copy()
+        qpos = self.data.qpos.copy()
+
+        # Penalty coefficients (you can tune these)
+        lambda_force = 10  # penalty weight for actuator force rate
+        lambda_qpos = 0   # penalty weight for joint angle rate
+
+
+        # Add penalties for rate of change
+        if self.prev_actuator_force is not None and self.prev_qpos is not None:
+            delta_force = actuator_force - self.prev_actuator_force
+            delta_qpos = qpos - self.prev_qpos
+
+            print('delta_force', delta_force)
+            # print('delta_qpos', len(delta_qpos))
+            # Apply L2 penalty on rate of change
+            force_penalty = lambda_force * np.sum(delta_force[1:])
+            qpos_penalty = lambda_qpos * np.sum(delta_qpos**2)
+
+            # Subtract penalties from reward
+            reward -= force_penalty
+            reward -= qpos_penalty
 
         self.reward_episode += reward
+        
+        # Update previous values
+        self.prev_actuator_force = actuator_force
+        self.prev_qpos = qpos
 
         # Log per-step data
         
@@ -237,8 +312,10 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         # self.data.qpos[:] = 0.0
         # self.data.qvel[:] = 0.0
         # mujoco.mj_forward(self.model, self.data)
+        self.prev_actuator_force = None
+        self.prev_qpos = None
 
-        self.x_start = self.data.qpos[0]
+        # self.x_start = self.data.qpos[0]
         return self.get_obs()
 
     def get_obs(self):
@@ -250,28 +327,6 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
     def _log_tendon_forces(self, rest_lengths: List[float]):
         """Compute and store active/passive forces dynamically from model values."""
         forces_this_step = []
-
-        # for i in range(3):
-        #     tendon_id = self.tendon_ids[i]
-        #     actuator_id = self.actuator_ids[i]
-        #     l = self.data.ten_length[tendon_id]
-        #     v = self.data.ten_velocity[tendon_id]
-        #     k = self.model.tendon_stiffness[tendon_id]
-        #     d = self.model.tendon_damping[tendon_id]
-        #     passive = k * (l - rest_lengths[i]) + d * v
-        #     active = self.data.actuator_force[actuator_id] * self.model.actuator_gear[actuator_id][0]
-
-        #     forces_this_step.append({
-        #         "tendon_id": tendon_id,
-        #         "active": active,
-        #         "passive": passive
-        #     })
-            # Note: actuator_force is already affected by ctrl and sim physics
-            # active = self.data.actuator_force[tendon_id] * self.model.actuator_gear[tendon_id][0]            
-
-            # print(f"Timestep {self.steps_from_reset}, Tendon {tendon_id}: "
-            # f"l={l:.3f}, v={v:.3f}, k={k:.2f}, d={d:.2f}, rest={rest_lengths[tendon_id]:.3f}, "
-            # f"active={active:.2f}, passive={passive:.2f}")
 
             
         actuator_names = ["T_M0_motor", "T_M1_motor", "T_M2_motor"]
@@ -315,14 +370,36 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.viewer.cam.fixedcamid = cam_id
         self.viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
         pass 
+    # def render(self, mode=None, *args, **kwargs):
+    #     if self.viewer is not None:
+    #         chassis_pos = self.data.body('Chassis').xpos
+    #         self.viewer.cam.lookat[:] = chassis_pos
+    #     try:
+    #         return super().render(*args, **kwargs)
+    #     except TypeError as e:
+    #         return super().render()
     def render(self, mode=None, *args, **kwargs):
         if self.viewer is not None:
-            chassis_pos = self.data.body('Chassis').xpos
-            self.viewer.cam.lookat[:] = chassis_pos
+            try:
+                chassis_pos = self.data.body('Chassis').xpos
+                self.viewer.cam.lookat[:] = chassis_pos
+            except Exception:
+                pass
+
+        if self.render_mode == "human" and self.viewer is not None:
+            # Disable overlay creation by monkey patching the viewer
+            self.viewer._create_overlay = lambda: None
+
         try:
             return super().render(*args, **kwargs)
-        except TypeError as e:
+        except TypeError:
             return super().render()
+    def _get_viewer(self, mode):
+        viewer = super()._get_viewer(mode)
+        if mode == "human":
+            viewer._create_overlay = lambda: None  # Disable overlay that uses solver_niter
+        return viewer
+
 
 
             
@@ -403,7 +480,7 @@ def train(config: TrainingConfig, seed: int) -> None:
 
     # ---------- Record demo video (optional) ----------
     try:
-        video_file = f"{save_path}/final_episode_{tag}_seed_{seed}.mp4"
+        video_file = f"{save_path}/final_episode_seed_{seed}.mp4"
         _record_final_episode_video(config, model, seed, video_file)
     except Exception as exc:
         print(f"[warn] video capture failed for seed {seed}: {exc}")

@@ -39,7 +39,7 @@ def main() -> None:
     if match:
         base_val = float(match.group(1))
         is_k = match.group(2) == "k"
-        stiffness_val = int(base_val * 1 if is_k else base_val)
+        stiffness_val = int(base_val / 10 if is_k else base_val)
         args.stiffness_start = stiffness_val
         args.stiffness_end = stiffness_val
         print(f"[INFO] Parsed constant stiffness: {stiffness_val} from growth_type '{args.growth_type}'")
