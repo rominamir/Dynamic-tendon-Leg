@@ -112,7 +112,7 @@ class TrainingConfig:
 # -----------------------------------------------------------------------------
 
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
-    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 20} #40 with frame_skip 5 
+    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40} #40 with frame_skip 5 
 
     def __init__(
         self,
@@ -130,7 +130,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(
-            self, xml_file, 10 , render_mode=render_mode, observation_space=self.observation_space
+            self, xml_file, 25 , render_mode=render_mode, observation_space=self.observation_space
         )## frame skip was 5 now changing it to 10
 
         if seed is not None:
@@ -453,11 +453,12 @@ def train(config: TrainingConfig, seed: int) -> None:
     model = PPO(
         "MlpPolicy",
         env,
-        learning_rate=config.lr,
-        # ent_coef=0.05,  # 🔧 Try 0.02 or 0.05
-
+        learning_rate=3e-4, #config.lr,
+        ent_coef=0.005,  # 🔧 Try 0.02 or 0.05
+        clip_range=0.1,
         seed=seed,
         verbose=1,
+        
         tensorboard_log=f"./tensorboard_logs/{folder}/",
         device='cpu'
     )

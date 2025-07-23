@@ -10,7 +10,7 @@
             default being uses, especially for Jul11th data: timestep=0.005 ANDframe_skip on env.py = 10
     -->
 
-    <option timestep="0.005" iterations="50" solver="Newton" tolerance="1e-10"/> 
+    <option timestep="0.001" iterations="50" solver="Newton" tolerance="1e-10"/> 
 
     <size njmax="50" nconmax="10" nstack="200"/>
 
