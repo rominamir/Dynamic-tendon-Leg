@@ -215,7 +215,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         # Reward logic (example)
         reward = 1000 * velocity 
-        reward += 10 * np.sum(np.abs(self.data.qvel[1:]))
+        #reward += 10 * np.sum(np.abs(self.data.qvel[1:]))
 
         # Optional: smoothness penalty
         # if self.step_counter >= self.use_tau_after:
