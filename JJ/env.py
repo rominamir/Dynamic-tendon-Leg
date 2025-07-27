@@ -1,10 +1,12 @@
 import os
+import io
 from datetime import datetime
 from typing import Optional
 from typing import List
 
 import imageio
 import gym
+import torch
 import mujoco
 import mujoco_env
 import numpy as np
@@ -43,6 +45,24 @@ class ConstantLR:
     def __call__(self, *_):
         return self.lr
 
+# -----------------------------------------------------------------------------
+# Stiffness Scheduler
+# -----------------------------------------------------------------------------
+class StiffnessScheduler:
+    def __init__(self, schedule_type='constant', start=5000, end=50000, total_steps=1_000_000):
+        self.schedule_type = schedule_type
+        self.start = start
+        self.end = end
+        self.total_steps = total_steps
+
+    def __call__(self, step: int) -> float:
+        if self.schedule_type == 'constant':
+            return self.start
+        elif self.schedule_type == 'linear':
+            progress = min(step / self.total_steps, 1.0)
+            return self.start + (self.end - self.start) * progress
+        else:
+            raise ValueError(f"Unsupported stiffness schedule: {self.schedule_type}")
 
 # -----------------------------------------------------------------------------
 # Training configuration
@@ -65,14 +85,17 @@ class TrainingConfig:
         seed_start: int = 100,
         seed_end: int = 124,
         run_date: str = None,   # New: allow passing a fixed run_date
-        growth_type: str = "constant_unknown",  # ✅ Add this
         folder_seed_start: int = None,
-        folder_seed_end: int = None
+        folder_seed_end: int = None,
+        growth_type: str = "constant",
         ) -> None:
+        def _fmt(v: int) -> str:
+            if v < 1000:
+                return str(v)
+            k = v / 1000
+            return f"{int(k)}k" if v % 1000 == 0 else f"{k:.1f}k"
         self.growth_type = growth_type  # ✅ Save it for folder naming
         self.algorithm = "PPO"
-        self.growth_type = growth_type
-
         self.stiffness_start = stiffness_start
         self.stiffness_end = stiffness_end
         self.num_seeds = num_seeds
@@ -80,9 +103,6 @@ class TrainingConfig:
         self.max_episode_steps = max_episode_steps
         self.num_epochs = num_epochs
         self.lr = lr
-
-
-
         self.prev_actuator_force = None
         self.prev_qpos = None
 
@@ -94,17 +114,34 @@ class TrainingConfig:
         self.seed_start = seed_start
         self.seed_end = seed_end
         self.lr_schedule = ConstantLR(lr)
-        self.stiffness_tag = f"constant_{int(self.stiffness_start/1000)}k"
+        if self.growth_type.startswith("constant"):
+            self.stiffness_tag = _fmt(self.stiffness_start)
+        else:
+            self.stiffness_tag = f"{_fmt(self.stiffness_start)}-{_fmt(self.stiffness_end)}"
+
 
         self.folder_seed_start = folder_seed_start if folder_seed_start is not None else seed_start
         self.folder_seed_end = folder_seed_end if folder_seed_end is not None else seed_end
 
     def folder_name(self) -> str:
+        def _fmt(v: int) -> str:
+            if v < 1000:
+                return str(v)
+            k = v / 1000
+            return f"{int(k)}k" if v % 1000 == 0 else f"{k:.1f}k"
         seeds_tag = f"seeds_{self.folder_seed_start}-{self.folder_seed_end}"
 
         lr_tag = f"{self.lr:.0e}".replace("e-0", "e-").replace("e-", "e-0")  # Formats like '5e-04'
-        
-        return f"LegEnv_{self.run_date}_{self.growth_type}_lr_{lr_tag}_PPO"
+        start_tag = _fmt(self.stiffness_start)
+        end_tag   = _fmt(self.stiffness_end)
+
+        if self.growth_type.startswith("constant"):
+            stiffness_part = start_tag
+        else:
+            stiffness_part = f"{start_tag}-{end_tag}"
+
+        return f"LegEnv_{self.run_date}_{seeds_tag}_{self.growth_type}_{stiffness_part}_lr_{lr_tag}_PPO"
+
 
 
 # -----------------------------------------------------------------------------
@@ -123,6 +160,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         stiffness_end: int = 50_000,
         num_epochs: int = 1_000,
         max_episode_steps: int = 1_000,
+        stiffness_schedule_type: str = 'constant',
     ) -> None:
         # Action / observation spaces
         self.action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
@@ -151,7 +189,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.stiffness_history: list[float] = []
         self.reward_episode = 0.0
         self.rewards: list[float] = []
-        self.displacements: list[float] = []
+        # self.displacements: list[float] = []
+        self.displacement_history = []
         self.x_start = 0.0
 
         # Additional episode-level data
@@ -177,8 +216,15 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.tau = 1.0
         # Apply initial constant stiffness
         self.filtered_action = None
-
+        self.log_handle: Optional[io.TextIOBase] = None
         self._apply_stiffness(self.stiffness_scaling)
+        self.stiffness_scheduler = StiffnessScheduler(
+            schedule_type=stiffness_schedule_type,  # default constant, use config to control
+            start=stiffness_start,
+            end=stiffness_end,
+            total_steps=num_epochs * max_episode_steps  # or config.total_timesteps
+        )
+
 
     # -------------------- MuJoCo helpers --------------------
     def _apply_stiffness(self, value: float) -> None:
@@ -207,6 +253,9 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         # Apply control using standard method
         self.do_simulation(action, self.frame_skip)
 
+        # Update stiffness dynamically
+        new_stiffness = self.stiffness_scheduler(self.global_step)
+        self._apply_stiffness(new_stiffness)
         
 
        
@@ -224,12 +273,16 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
             
-        print("qpos:", self.data.qpos)
-        print("qvel:", self.data.qvel)
+        # print("qpos:", self.data.qpos)
+        # print("qvel:", self.data.qvel)
         # print("tendon_force:", self.data.tendon_force)
-        print("ctrl:", self.data.ctrl)
-
-        print('reward', reward)
+        # print("ctrl:", self.data.ctrl)
+        # print('reward', reward)
+        # if self.log_handle:
+        #     self.log_handle.write(f"qpos:  {self.data.qpos.tolist()}\n")
+        #     self.log_handle.write(f"qvel:  {self.data.qvel.tolist()}\n")
+        #     self.log_handle.write(f"ctrl:  {self.data.ctrl.tolist()}\n")
+        #     self.log_handle.write(f"reward: {reward}\n")
         # Get current actuator forces and joint angles
         actuator_force = self.data.actuator_force.copy()
         qpos = self.data.qpos.copy()
@@ -244,7 +297,9 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             delta_force = actuator_force - self.prev_actuator_force
             delta_qpos = qpos - self.prev_qpos
 
-            print('delta_force', delta_force)
+            # print('delta_force', delta_force)
+            # if self.log_handle:
+            #     self.log_handle.write(f"delta_force: {delta_force.tolist()}\n")
             # print('delta_qpos', len(delta_qpos))
             # Apply L2 penalty on rate of change
             force_penalty = lambda_force * np.sum(delta_force[1:])
@@ -279,29 +334,35 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         done = self.steps_from_reset >= self.max_episode_steps
         if done:
-            
+            # --- Debug print ---
             # print(f"[DEBUG] Episode finished — reward = {self.reward_episode}, steps = {self.steps_from_reset}")
 
+            # ---  episode reward ---
             self.rewards.append(self.reward_episode)
 
-            # Save episode-level data
+            # ---  episode data  ---
             self.qpos_history.append(self.qpos_episode)
             self.qvel_history.append(self.qvel_episode)
             self.tendon_lengths_history.append(self.tendon_lengths_episode)
             self.actuator_force_history.append(self.actuator_forces_episode)
             self.tendon_force_history.append(self.tendon_force_episode)
-            
 
-            # Reset per-episode storage
+            # --- displacement ---
+            displacement = x_after - self.x_start
+            self.displacement_history.append(displacement)   
+            # self.displacements.clear()                       
+
+            # --- clear episode data ---
             self.qpos_episode = []
             self.qvel_episode = []
             self.tendon_lengths_episode = []
             self.actuator_forces_episode = []
             self.tendon_force_episode = []
 
-            self.displacements.append(x_after - self.x_start)
+            # --- reset ---
             self.reward_episode = 0.0
             self.steps_from_reset = 0
+
 
         return self.get_obs(), reward, done, False, {}
 
@@ -315,7 +376,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         self.prev_actuator_force = None
         self.prev_qpos = None
 
-        # self.x_start = self.data.qpos[0]
+        self.x_start = self.data.qpos[0]
         return self.get_obs()
 
     def get_obs(self):
@@ -360,6 +421,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def seed(self, seed: Optional[int] = None):
         np.random.seed(seed)
+        torch.manual_seed(seed)
         self.action_space.seed(seed)
         self.observation_space.seed(seed)
 
@@ -415,7 +477,6 @@ def train(config: TrainingConfig, seed: int) -> None:
     """
     # ---------- Setup save folders ----------
     folder    = config.folder_name()
-    tag       = '' #config.stiffness_tag
     save_path = f"./data/{folder}"
     os.makedirs(save_path, exist_ok=True)
 
@@ -442,18 +503,25 @@ def train(config: TrainingConfig, seed: int) -> None:
     # ---------- Create environment ----------
     env = LegEnvBase(
         render_mode=None,
+        stiffness_schedule_type=config.growth_type,
         stiffness_start=config.stiffness_start,
         stiffness_end=config.stiffness_end,
         num_epochs=config.num_epochs,
         max_episode_steps=config.max_episode_steps,
     )
     env.seed(seed)
+    # ---------- log saves ----------
+    logs_dir = os.path.join(save_path, "logs")
+    os.makedirs(logs_dir, exist_ok=True)
+    log_path = os.path.join(logs_dir, f"log_seed_{seed}.txt")
+    env.log_handle = open(log_path, "w", buffering=1)
+
 
     # ---------- Setup PPO and train ----------
     model = PPO(
         "MlpPolicy",
         env,
-        learning_rate=3e-4, #config.lr,
+        learning_rate=config.lr_schedule, #config.lr,
         ent_coef=0.005,  # 🔧 Try 0.02 or 0.05
         clip_range=0.1,
         seed=seed,
@@ -462,15 +530,17 @@ def train(config: TrainingConfig, seed: int) -> None:
         tensorboard_log=f"./tensorboard_logs/{folder}/",
         device='cpu'
     )
-
-    model.learn(total_timesteps=config.total_timesteps)
+    try:
+        model.learn(total_timesteps=config.total_timesteps)
+    finally:
+        env.log_handle.close()
 
     # ---------- Save model and data ----------
     model.save(f"{model_dir}/model_seed_{seed}.zip")
 
-    np.save(f"{rewards_dir}/rewards_seed_{seed}.npy", env.rewards)
-    np.save(f"{disp_dir}/displacements_seed_{seed}.npy", env.displacements)
-    np.save(f"{stiffness_dir}/stiffness_seed_{seed}.npy", env.stiffness_history)
+    np.save(f"{rewards_dir}/rewards_{config.stiffness_tag}_seed_{seed}.npy", env.rewards)
+    np.save(f"{disp_dir}/displacements_seed_{seed}.npy", np.array(env.displacement_history, dtype=float))
+    np.save(f"{stiffness_dir}/stiffness_{config.stiffness_tag}_seed_{seed}.npy", env.stiffness_history)
 
     np.save(f"{kinematic_dir}/qpos_seed_{seed}.npy", np.array(env.qpos_history, dtype=object))
     np.save(f"{kinematic_dir}/qvel_seed_{seed}.npy", np.array(env.qvel_history, dtype=object))
@@ -542,8 +612,8 @@ def aggregate_and_save_results(config: TrainingConfig) -> None:
     disp_dir = f'./data/{folder}/displacements'
 
     for seed in range(config.seed_start, config.seed_end + 1):
-        r_path = f'{rewards_dir}/rewards_{tag}_seed_{seed}.npy'
-        d_path = f'{disp_dir}/displacements_{tag}_seed_{seed}.npy'
+        r_path = f"{rewards_dir}/rewards_{config.stiffness_tag}_seed_{seed}.npy"
+        d_path = f'{disp_dir}/displacements_seed_{seed}.npy'
         if os.path.isfile(r_path):
             reward_list.append(np.load(r_path))
         if os.path.isfile(d_path):
