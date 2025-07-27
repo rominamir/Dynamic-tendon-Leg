@@ -1,0 +1,5 @@
+JJ/data/
+*.npy
+JJ/logs/
+JJ/tensorboard_logs/
+JJ/tensorboard_log/
