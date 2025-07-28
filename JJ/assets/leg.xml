@@ -116,10 +116,10 @@
 
     </tendon>
 
-    <actuator>  
-       <motor name="T_M0_motor" tendon="T_M0"  />
-        <motor name="T_M1_motor" tendon="T_M1"  />
-        <motor name="T_M2_motor" tendon="T_M2"  />  
+    <actuator>
+        <motor name="T_M0_motor" tendon="T_M0" ctrlrange="0 1" ctrllimited="true" forcerange="0 200" forcelimited="true"/>
+        <motor name="T_M1_motor" tendon="T_M1" ctrlrange="0 1" ctrllimited="true" forcerange="0 200" forcelimited="true"/>
+        <motor name="T_M2_motor" tendon="T_M2" ctrlrange="0 1" ctrllimited="true" forcerange="0 200" forcelimited="true"/>
     </actuator>  
 
     <!-- <actuator>

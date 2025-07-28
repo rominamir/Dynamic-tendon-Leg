@@ -1,8 +1,7 @@
 import os
 import io
 from datetime import datetime
-from typing import Optional
-from typing import List
+from typing import Optional, List
 
 import imageio
 import gym
@@ -13,7 +12,7 @@ import numpy as np
 from gym import utils
 from stable_baselines3 import PPO
 
-"""Constant‑stiffness PPO environment & utilities (Python 3.8+ compatible).
+"""Constant-stiffness PPO environment & utilities (Python 3.8+ compatible).
 Folder names now embed the exact constant value, e.g. ``constant_10k``.
 """
 
@@ -49,17 +48,24 @@ class ConstantLR:
 # Stiffness Scheduler
 # -----------------------------------------------------------------------------
 class StiffnessScheduler:
-    def __init__(self, schedule_type='constant', start=5000, end=50000, total_steps=1_000_000):
+    """Calculates the stiffness value based on the current epoch."""
+    def __init__(self, schedule_type='constant', start=5000, end=50000, total_epochs=1000):
         self.schedule_type = schedule_type
         self.start = start
         self.end = end
-        self.total_steps = total_steps
+        self.total_epochs = total_epochs
 
-    def __call__(self, step: int) -> float:
+    def __call__(self, epoch: int) -> float:
+        """Returns the stiffness for a given epoch."""
         if self.schedule_type == 'constant':
             return self.start
         elif self.schedule_type == 'linear':
-            progress = min(step / self.total_steps, 1.0)
+            # Safety check to prevent division by zero if there's only one epoch.
+            if self.total_epochs <= 1:
+                return self.start
+            # Calculate progress from 0.0 to 1.0 based on the current epoch.
+            # (epoch - 1) is used because epochs are 1-indexed.
+            progress = min((epoch - 1) / (self.total_epochs - 1), 1.0)
             return self.start + (self.end - self.start) * progress
         else:
             raise ValueError(f"Unsupported stiffness schedule: {self.schedule_type}")
@@ -90,6 +96,7 @@ class TrainingConfig:
         growth_type: str = "constant",
         ) -> None:
         def _fmt(v: int) -> str:
+            """Formats an integer into a 'k' notation if large enough."""
             if v < 1000:
                 return str(v)
             k = v / 1000
@@ -114,17 +121,20 @@ class TrainingConfig:
         self.seed_start = seed_start
         self.seed_end = seed_end
         self.lr_schedule = ConstantLR(lr)
+        # Create a tag for stiffness range for folder naming.
         if self.growth_type.startswith("constant"):
             self.stiffness_tag = _fmt(self.stiffness_start)
         else:
             self.stiffness_tag = f"{_fmt(self.stiffness_start)}-{_fmt(self.stiffness_end)}"
 
-
+        # Determine seed range for folder naming.
         self.folder_seed_start = folder_seed_start if folder_seed_start is not None else seed_start
         self.folder_seed_end = folder_seed_end if folder_seed_end is not None else seed_end
 
     def folder_name(self) -> str:
+        """Generates a descriptive folder name based on training parameters."""
         def _fmt(v: int) -> str:
+            """Inner helper to format numbers."""
             if v < 1000:
                 return str(v)
             k = v / 1000
@@ -145,11 +155,11 @@ class TrainingConfig:
 
 
 # -----------------------------------------------------------------------------
-# Custom MuJoCo environment (constant stiffness only)
+# Custom MuJoCo environment
 # -----------------------------------------------------------------------------
 
 class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
-    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40} #40 with frame_skip 5 
+    metadata = {"render_modes": ["human", "rgb_array", "depth_array"], "render_fps": 40} #40 with frame_skip 5
 
     def __init__(
         self,
@@ -161,11 +171,11 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         num_epochs: int = 1_000,
         max_episode_steps: int = 1_000,
         stiffness_schedule_type: str = 'constant',
+        total_training_steps: int = 1_000_000,
     ) -> None:
-        # Action / observation spaces
+        # --- MujocoEnv setup ---
         self.action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
         self.observation_space = gym.spaces.Box(low=-10, high=10, shape=(6,), dtype=np.float32)
-
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(
             self, xml_file, 25 , render_mode=render_mode, observation_space=self.observation_space
@@ -174,116 +184,77 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         if seed is not None:
             self.seed(seed)
 
-        self.stiffness_start = stiffness_start
-        self.stiffness_end = stiffness_end
-        self.num_epochs = num_epochs
+        # --- Cleaned and consolidated initialization logic ---
         self.max_episode_steps = max_episode_steps
-
-        # Episode bookkeeping
         self.epoch_counter = 0
         self.steps_from_reset = 0
         self.global_step = 0
+        self.step_counter = 0
 
-        # Data logging structures
-        self.stiffness_scaling = stiffness_start
+        # --- Data logging structures (initialize all history lists first) ---
         self.stiffness_history: list[float] = []
-        self.reward_episode = 0.0
         self.rewards: list[float] = []
-        # self.displacements: list[float] = []
         self.displacement_history = []
+        self.qpos_history, self.qvel_history = [], []
+        self.actuator_force_history, self.tendon_lengths_history, self.tendon_force_history = [], [], []
+
+        # --- Per-episode data buffers ---
+        self.qpos_episode, self.qvel_episode = [], []
+        self.actuator_forces_episode, self.tendon_lengths_episode, self.tendon_force_episode = [], [], []
+
+        self.reward_episode = 0.0
         self.x_start = 0.0
 
-        # Additional episode-level data
-        self.qpos_episode = []
-        self.qvel_episode = []
-        self.actuator_forces_episode = []
-        self.tendon_lengths_episode = []
-
-        self.qpos_history = []
-        self.qvel_history = []
-        
-        self.tendon_force_history = []  # New: stores per-step tendon force info
-        self.tendon_force_episode = []  # New: stores tendon forces for current episode
-
-        self.actuator_force_history = []
-        self.tendon_lengths_history = []
-
-
-        self.activation = np.zeros(self.model.nu)
-        self.smooth_weight = 0.01  # or lower
-        self.use_tau_after = 100_000
-        self.step_counter=0
-        self.tau = 1.0
-        # Apply initial constant stiffness
-        self.filtered_action = None
-        self.log_handle: Optional[io.TextIOBase] = None
-        self._apply_stiffness(self.stiffness_scaling)
+        # --- Scheduler setup ---
+        # Calculate total epochs based on total training steps and episode length.
+        self.total_epochs = total_training_steps // self.max_episode_steps
         self.stiffness_scheduler = StiffnessScheduler(
-            schedule_type=stiffness_schedule_type,  # default constant, use config to control
+            schedule_type=stiffness_schedule_type,
             start=stiffness_start,
             end=stiffness_end,
-            total_steps=num_epochs * max_episode_steps  # or config.total_timesteps
+            total_epochs=self.total_epochs
         )
+
+        # Apply and record the initial stiffness after history lists are created.
+        self.stiffness_scaling = stiffness_start
+        self._apply_stiffness(self.stiffness_scaling)
+
+        # --- Other attributes ---
+        self.prev_actuator_force = None
+        self.prev_qpos = None
+        self.log_handle: Optional[io.TextIOBase] = None
 
 
     # -------------------- MuJoCo helpers --------------------
     def _apply_stiffness(self, value: float) -> None:
+        """Applies a stiffness value to all tendons and records it."""
         for i in range(len(self.model.tendon_stiffness)):
             self.model.tendon_stiffness[i] = value
+        # Append the new stiffness value to the history log.
         self.stiffness_history.append(value)
 
     # -------------------- RL loop --------------------
     def step(self, action):
-        self.step_counter += 1
-
+        """Executes one timestep within the environment."""
+        self.step_counter += 1 # A simple counter for steps.
 
         x_before = self.data.qpos[0]
-
-
-
-        # # Smooth action: low-pass filter to simulate actuator lag
-        # alpha = 0.9  # closer to 1 = slower response
-        # if self.filtered_action is None:
-        #     self.filtered_action = action.copy()
-        # else:
-        #     self.filtered_action = alpha * self.filtered_action + (1 - alpha) * action
-
-        # self.do_simulation(self.filtered_action, self.frame_skip)
 
         # Apply control using standard method
         self.do_simulation(action, self.frame_skip)
 
-        # Update stiffness dynamically
-        new_stiffness = self.stiffness_scheduler(self.global_step)
-        self._apply_stiffness(new_stiffness)
-        
+        # Stiffness update is now handled in `reset_model`, not here.
+        # # new_stiffness = self.stiffness_scheduler(self.global_step)
+        # # self._apply_stiffness(new_stiffness)
 
-       
         x_after = self.data.qpos[0]
+        # Calculate forward velocity as the primary reward signal.
         velocity = (x_after - x_before) / (self.dt * self.frame_skip)
 
         # Reward logic (example)
-        reward = 1000 * velocity 
-        #reward += 10 * np.sum(np.abs(self.data.qvel[1:]))
+        reward = 1000 * velocity
 
-        # Optional: smoothness penalty
-        # if self.step_counter >= self.use_tau_after:
-        #     smooth_penalty = np.sum(np.abs(ctrl - target_ctrls))
-        #     reward -= self.smooth_weight * smooth_penalty
-
-
-            
-        # print("qpos:", self.data.qpos)
-        # print("qvel:", self.data.qvel)
-        # print("tendon_force:", self.data.tendon_force)
-        # print("ctrl:", self.data.ctrl)
-        # print('reward', reward)
-        # if self.log_handle:
-        #     self.log_handle.write(f"qpos:  {self.data.qpos.tolist()}\n")
-        #     self.log_handle.write(f"qvel:  {self.data.qvel.tolist()}\n")
-        #     self.log_handle.write(f"ctrl:  {self.data.ctrl.tolist()}\n")
-        #     self.log_handle.write(f"reward: {reward}\n")
-        # Get current actuator forces and joint angles
+        # Get current actuator forces and joint angles for penalty calculation.
         actuator_force = self.data.actuator_force.copy()
         qpos = self.data.qpos.copy()
 
@@ -292,15 +263,11 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         lambda_qpos = 0   # penalty weight for joint angle rate
 
 
-        # Add penalties for rate of change
+        # Add penalties for rate of change to encourage smoother movements.
         if self.prev_actuator_force is not None and self.prev_qpos is not None:
             delta_force = actuator_force - self.prev_actuator_force
             delta_qpos = qpos - self.prev_qpos
 
-            # print('delta_force', delta_force)
-            # if self.log_handle:
-            #     self.log_handle.write(f"delta_force: {delta_force.tolist()}\n")
-            # print('delta_qpos', len(delta_qpos))
             # Apply L2 penalty on rate of change
             force_penalty = lambda_force * np.sum(delta_force[1:])
             qpos_penalty = lambda_qpos * np.sum(delta_qpos**2)
@@ -310,13 +277,12 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             reward -= qpos_penalty
 
         self.reward_episode += reward
-        
-        # Update previous values
+
+        # Update previous values for the next step's penalty calculation.
         self.prev_actuator_force = actuator_force
         self.prev_qpos = qpos
 
-        # Log per-step data
-        
+        # Log per-step data into episode buffers.
         self.qpos_episode.append(self.data.qpos.copy())
         self.qvel_episode.append(self.data.qvel.copy())
         self.tendon_lengths_episode.append(self.data.ten_length.copy())
@@ -325,122 +291,110 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         rest_lengths = [2.048585725311554, 1.2340794371759454, 1.7340794371759456]
         self._log_tendon_forces(rest_lengths)
 
-        
-
         self.steps_from_reset += 1
         self.global_step += 1
 
-
-
+        # Check if the episode is done.
         done = self.steps_from_reset >= self.max_episode_steps
         if done:
-            # --- Debug print ---
-            # print(f"[DEBUG] Episode finished — reward = {self.reward_episode}, steps = {self.steps_from_reset}")
-
-            # ---  episode reward ---
+            # --- Log episode reward ---
             self.rewards.append(self.reward_episode)
 
-            # ---  episode data  ---
+            # --- Append episode data to main history logs ---
             self.qpos_history.append(self.qpos_episode)
             self.qvel_history.append(self.qvel_episode)
             self.tendon_lengths_history.append(self.tendon_lengths_episode)
             self.actuator_force_history.append(self.actuator_forces_episode)
             self.tendon_force_history.append(self.tendon_force_episode)
 
-            # --- displacement ---
+            # --- Log final displacement for the episode ---
             displacement = x_after - self.x_start
-            self.displacement_history.append(displacement)   
-            # self.displacements.clear()                       
+            self.displacement_history.append(displacement)
 
-            # --- clear episode data ---
+            # --- Clear episode data buffers for the next episode ---
             self.qpos_episode = []
             self.qvel_episode = []
             self.tendon_lengths_episode = []
             self.actuator_forces_episode = []
             self.tendon_force_episode = []
 
-            # --- reset ---
+            # --- Reset episode-specific counters ---
             self.reward_episode = 0.0
             self.steps_from_reset = 0
-
 
         return self.get_obs(), reward, done, False, {}
 
     def reset_model(self):
+        """Resets the environment for a new episode."""
         self.epoch_counter += 1
+        new_k = self.stiffness_scheduler(self.epoch_counter)
+        self._apply_stiffness(new_k)
+        
+        # Calculate and apply the new stiffness for this new epoch.
+        new_stiffness = self.stiffness_scheduler(self.epoch_counter)
+        self._apply_stiffness(new_stiffness)
 
-        # # Hard reset to zero state
-        # self.data.qpos[:] = 0.0
-        # self.data.qvel[:] = 0.0
-        # mujoco.mj_forward(self.model, self.data)
+        # Optional: Print progress for debugging.
+        if self.epoch_counter % 50 == 0 or self.epoch_counter == 1:
+             print(f"Epoch: {self.epoch_counter}/{self.total_epochs}, New Stiffness: {new_stiffness:.2f}")
+
+        # Reset state variables for penalty calculations.
         self.prev_actuator_force = None
         self.prev_qpos = None
 
+        # Store the starting x-position to calculate displacement later.
         self.x_start = self.data.qpos[0]
         return self.get_obs()
 
     def get_obs(self):
+        """Returns the current observation from the environment."""
         return np.concatenate((self.data.qpos.flat.copy(), self.data.qvel.flat.copy())).ravel()
 
-    
-    
-    
     def _log_tendon_forces(self, rest_lengths: List[float]):
         """Compute and store active/passive forces dynamically from model values."""
         forces_this_step = []
 
-            
         actuator_names = ["T_M0_motor", "T_M1_motor", "T_M2_motor"]
-        tendon_names = ["T_M0", "T_M1", "T_M2"]
 
         for i, actuator_name in enumerate(actuator_names):
             actuator_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name)
             ctrl = self.data.ctrl[actuator_id]
-            force = self.data.actuator_force[actuator_id]
+            # Calculate active force from control signal and gear ratio.
             gear = self.model.actuator_gear[actuator_id][0] if self.model.actuator_gear.shape[1] > 0 else 1.0
             active_force = ctrl * gear
-            # print(f"gear={gear}" )
-            # print(f"[DEBUG] Actuator {actuator_id}:  ctrl={ctrl:.3f}, force={active_force:.3f}")
 
+            # Calculate passive force from tendon properties (Hooke's law).
             l = self.data.ten_length[i]
             v = self.data.ten_velocity[i]
-
             k = self.model.tendon_stiffness[i]
             d = self.model.tendon_damping[i]
             passive = k * (l - rest_lengths[i]) + d * v
+
             forces_this_step.append({
                 "tendon_id": actuator_id,
                 "active": active_force,
                 "passive": passive
             })
-            # print(f"[DEBUG] {tendon_names[i]} -> actuator_id={actuator_id}, ctrl={ctrl:.3f}, "
-            #     f"active_force={active_force:.3f}, passive_force={passive:.3f}"
-            #     f"k={k:.3f}, v = {v:.3f}, l ={l:.3f},  rest_lengths = {rest_lengths[i]:.3f}")
 
         self.tendon_force_episode.append(forces_this_step)
 
     def seed(self, seed: Optional[int] = None):
+        """Sets the seed for this env's random number generators."""
         np.random.seed(seed)
         torch.manual_seed(seed)
         self.action_space.seed(seed)
         self.observation_space.seed(seed)
 
     def viewer_setup(self):
+        """Sets up the camera for rendering."""
         cam_id = mujoco.mj_name2id(self.model,
                                 mujoco.mjtObj.mjOBJ_CAMERA,
                                 "follow_leg")
         self.viewer.cam.fixedcamid = cam_id
         self.viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
-        pass 
-    # def render(self, mode=None, *args, **kwargs):
-    #     if self.viewer is not None:
-    #         chassis_pos = self.data.body('Chassis').xpos
-    #         self.viewer.cam.lookat[:] = chassis_pos
-    #     try:
-    #         return super().render(*args, **kwargs)
-    #     except TypeError as e:
-    #         return super().render()
+
     def render(self, mode=None, *args, **kwargs):
+        """Renders the environment with camera tracking."""
         if self.viewer is not None:
             try:
                 chassis_pos = self.data.body('Chassis').xpos
@@ -450,22 +404,13 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
 
         if self.render_mode == "human" and self.viewer is not None:
             # Disable overlay creation by monkey patching the viewer
-            self.viewer._create_overlay = lambda: None
+            self._get_viewer(self.render_mode)._create_overlay = lambda: None
 
         try:
             return super().render(*args, **kwargs)
         except TypeError:
+            # Fallback for older gym versions
             return super().render()
-    def _get_viewer(self, mode):
-        viewer = super()._get_viewer(mode)
-        if mode == "human":
-            viewer._create_overlay = lambda: None  # Disable overlay that uses solver_niter
-        return viewer
-
-
-
-            
-
 
 # -----------------------------------------------------------------------------
 # Training loop
@@ -480,7 +425,7 @@ def train(config: TrainingConfig, seed: int) -> None:
     save_path = f"./data/{folder}"
     os.makedirs(save_path, exist_ok=True)
 
-    # Create subfolders
+    # Create subfolders for different data types.
     model_dir = os.path.join(save_path, "model")
     rewards_dir = os.path.join(save_path, "rewards")
     disp_dir = os.path.join(save_path, "displacements")
@@ -501,6 +446,7 @@ def train(config: TrainingConfig, seed: int) -> None:
 
 
     # ---------- Create environment ----------
+    # Pass necessary parameters from the config to the environment.
     env = LegEnvBase(
         render_mode=None,
         stiffness_schedule_type=config.growth_type,
@@ -508,6 +454,7 @@ def train(config: TrainingConfig, seed: int) -> None:
         stiffness_end=config.stiffness_end,
         num_epochs=config.num_epochs,
         max_episode_steps=config.max_episode_steps,
+        total_training_steps=config.total_timesteps,
     )
     env.seed(seed)
     # ---------- log saves ----------
@@ -521,12 +468,11 @@ def train(config: TrainingConfig, seed: int) -> None:
     model = PPO(
         "MlpPolicy",
         env,
-        learning_rate=config.lr_schedule, #config.lr,
+        learning_rate=config.lr_schedule,
         ent_coef=0.005,  # 🔧 Try 0.02 or 0.05
         clip_range=0.1,
         seed=seed,
         verbose=1,
-        
         tensorboard_log=f"./tensorboard_logs/{folder}/",
         device='cpu'
     )
@@ -538,6 +484,7 @@ def train(config: TrainingConfig, seed: int) -> None:
     # ---------- Save model and data ----------
     model.save(f"{model_dir}/model_seed_{seed}.zip")
 
+    # Save all collected data to .npy files.
     np.save(f"{rewards_dir}/rewards_{config.stiffness_tag}_seed_{seed}.npy", env.rewards)
     np.save(f"{disp_dir}/displacements_seed_{seed}.npy", np.array(env.displacement_history, dtype=float))
     np.save(f"{stiffness_dir}/stiffness_{config.stiffness_tag}_seed_{seed}.npy", env.stiffness_history)
@@ -558,19 +505,22 @@ def train(config: TrainingConfig, seed: int) -> None:
 
     env.close()
 
-
-
-
 def _record_final_episode_video(
     config: TrainingConfig, model, seed: int, outfile: str, max_frames: int = 1_000
 ) -> None:
     """Run one episode in an RGB-array env and save it as an MP4."""
+
+    # Create an environment with a constant, final stiffness for video recording.
     env = LegEnvBase(
         render_mode="rgb_array",
-        stiffness_start=config.stiffness_start,
+        # Key change: Set schedule_type to 'constant' for the video.
+        stiffness_schedule_type='constant',
+        # Key change: Set the start stiffness to the final stiffness value.
+        stiffness_start=config.stiffness_end,
         stiffness_end=config.stiffness_end,
-        num_epochs=1,
         max_episode_steps=config.max_episode_steps,
+        # total_training_steps is not used in constant mode but passed for consistency.
+        total_training_steps=config.total_timesteps,
     )
     env.seed(seed)
     _ = env.render()
@@ -583,7 +533,6 @@ def _record_final_episode_video(
     while not done and steps < max_frames:
         action, _ = model.predict(obs, deterministic=True)
         obs, _, done, _, _ = env.step(action)
-        # cam_id = mujoco.mj_name2id(env.model, mujoco.mjtObj.mjOBJ_CAMERA, "follow_leg")
         frame = env.render()
         if frame is not None:
             frames.append(frame)
@@ -619,7 +568,7 @@ def aggregate_and_save_results(config: TrainingConfig) -> None:
         if os.path.isfile(d_path):
             disp_list.append(np.load(d_path))
 
-    # Reward
+    # Aggregate and save reward data.
     if reward_list:
         min_len = min(len(r) for r in reward_list)
         rewards = np.stack([r[:min_len] for r in reward_list])
@@ -628,7 +577,7 @@ def aggregate_and_save_results(config: TrainingConfig) -> None:
                 rewards.std(axis=0, ddof=1) / np.sqrt(rewards.shape[0]))
         print(f"✅ Aggregated rewards saved → {save_dir}")
 
-    # Displacement
+    # Aggregate and save displacement data.
     if disp_list:
         min_len = min(len(d) for d in disp_list)
         disps = np.stack([d[:min_len] for d in disp_list])
