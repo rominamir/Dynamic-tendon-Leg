@@ -48,27 +48,90 @@ class ConstantLR:
 # Stiffness Scheduler
 # -----------------------------------------------------------------------------
 class StiffnessScheduler:
-    """Calculates the stiffness value based on the current epoch."""
-    def __init__(self, schedule_type='constant', start=5000, end=50000, total_epochs=1000):
+    """
+    Calculates stiffness based on the current epoch.
+
+    Supported schedule_type values:
+    - 'constant' : stiffness stays fixed at start value.
+    - 'linear'   : stiffness increases (or decreases) linearly from start to end.
+    - 'expo'     : exponential (geometric) interpolation from start to end.
+    - 'log'      : logarithmic growth; fast at the beginning, slows down later.
+
+    Parameters
+    ----------
+    schedule_type : str
+        One of 'constant', 'linear', 'expo', 'log'.
+    start : float
+        Starting stiffness value.
+    end : float
+        Final stiffness value.
+    total_epochs : int
+        Number of total epochs in training; used to normalize progress.
+    curve_param : float
+        Shape parameter for log schedule; higher values = faster early growth.
+        Only applies if schedule_type is 'log'.
+    """
+    def __init__(
+        self,
+        schedule_type='constant',
+        start=5000,
+        end=50000,
+        total_epochs=1000,
+        curve_param: float = 9.0,  # Shape parameter for 'log' schedule
+    ):
         self.schedule_type = schedule_type
-        self.start = start
-        self.end = end
-        self.total_epochs = total_epochs
+        self.start = float(start)
+        self.end = float(end)
+        self.total_epochs = int(total_epochs)
+        self.curve_param = float(curve_param)
+
+    def _progress(self, epoch: int) -> float:
+        """
+        Convert epoch index (1-based) to progress in [0, 1].
+        Ensures progress is clamped between 0 and 1.
+        """
+        if self.total_epochs <= 1:
+            return 0.0
+        # (epoch - 1) makes sure the very first epoch is 0% progress
+        return min(max((epoch - 1) / (self.total_epochs - 1), 0.0), 1.0)
 
     def __call__(self, epoch: int) -> float:
-        """Returns the stiffness for a given epoch."""
+        """
+        Get the stiffness value for the given epoch.
+        """
+        p = self._progress(epoch)
+        s0, s1 = self.start, self.end
+
         if self.schedule_type == 'constant':
-            return self.start
+            # Always return the start value
+            return s0
+
         elif self.schedule_type == 'linear':
-            # Safety check to prevent division by zero if there's only one epoch.
-            if self.total_epochs <= 1:
-                return self.start
-            # Calculate progress from 0.0 to 1.0 based on the current epoch.
-            # (epoch - 1) is used because epochs are 1-indexed.
-            progress = min((epoch - 1) / (self.total_epochs - 1), 1.0)
-            return self.start + (self.end - self.start) * progress
+            # Linear interpolation between start and end
+            return s0 + (s1 - s0) * p
+
+        elif self.schedule_type == 'expo':
+            # Exponential (geometric) interpolation.
+            # Requires positive start and end values for log calculation.
+            if s0 > 0.0 and s1 > 0.0:
+                import math
+                return math.exp((1.0 - p) * math.log(s0) + p * math.log(s1))
+            else:
+                # Fallback to linear if values are not positive
+                return s0 + (s1 - s0) * p
+
+        elif self.schedule_type == 'log':
+            # Logarithmic growth: fast start, slow end.
+            # curve_param controls curvature: larger = more front-loaded.
+            import math
+            k = self.curve_param if self.curve_param > 0 else 9.0
+            denom = math.log1p(k)
+            p_log = math.log1p(k * p) / denom if denom != 0 else p
+            return s0 + (s1 - s0) * p_log
+
         else:
             raise ValueError(f"Unsupported stiffness schedule: {self.schedule_type}")
+
 
 # -----------------------------------------------------------------------------
 # Training configuration
