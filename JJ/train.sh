@@ -89,6 +89,7 @@ python train.py \
   --lr "$LR" \
   --stiffness_start "$STIFF_START" \
   --stiffness_end "$STIFF_END" \
+  --curve_param "$CURVE_PARAM" \
   --seed_start "$SEED_START" \
   --seed_end "$SEED_END" \
   --total_timesteps "$TOTAL_TS"

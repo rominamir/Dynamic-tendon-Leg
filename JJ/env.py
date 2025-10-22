@@ -56,11 +56,12 @@ class StiffnessScheduler:
     - 'linear'   : stiffness increases (or decreases) linearly from start to end.
     - 'expo'     : exponential (geometric) interpolation from start to end.
     - 'log'      : logarithmic growth; fast at the beginning, slows down later.
+    - 'sigmoid'  : S-shaped growth; slow at start and end, fast in the middle.
 
     Parameters
     ----------
     schedule_type : str
-        One of 'constant', 'linear', 'expo', 'log'.
+        One of 'constant', 'linear', 'expo', 'log', 'sigmoid'.
     start : float
         Starting stiffness value.
     end : float
@@ -68,16 +69,18 @@ class StiffnessScheduler:
     total_epochs : int
         Number of total epochs in training; used to normalize progress.
     curve_param : float
-        Shape parameter for log schedule; higher values = faster early growth.
-        Only applies if schedule_type is 'log'.
+        Shape parameter controlling the curvature:
+        - For 'log': larger = faster early growth.
+        - For 'sigmoid': larger = steeper mid-transition.
     """
+
     def __init__(
         self,
         schedule_type='constant',
         start=5000,
         end=50000,
         total_epochs=1000,
-        curve_param: float = 9.0,  # Shape parameter for 'log' schedule
+        curve_param: float = 9.0,
     ):
         self.schedule_type = schedule_type
         self.start = float(start)
@@ -92,42 +95,44 @@ class StiffnessScheduler:
         """
         if self.total_epochs <= 1:
             return 0.0
-        # (epoch - 1) makes sure the very first epoch is 0% progress
         return min(max((epoch - 1) / (self.total_epochs - 1), 0.0), 1.0)
 
     def __call__(self, epoch: int) -> float:
         """
         Get the stiffness value for the given epoch.
         """
+        import math
+
         p = self._progress(epoch)
         s0, s1 = self.start, self.end
 
         if self.schedule_type == 'constant':
-            # Always return the start value
             return s0
 
         elif self.schedule_type == 'linear':
-            # Linear interpolation between start and end
             return s0 + (s1 - s0) * p
 
         elif self.schedule_type == 'expo':
-            # Exponential (geometric) interpolation.
-            # Requires positive start and end values for log calculation.
             if s0 > 0.0 and s1 > 0.0:
-                import math
                 return math.exp((1.0 - p) * math.log(s0) + p * math.log(s1))
             else:
-                # Fallback to linear if values are not positive
                 return s0 + (s1 - s0) * p
 
         elif self.schedule_type == 'log':
-            # Logarithmic growth: fast start, slow end.
-            # curve_param controls curvature: larger = more front-loaded.
-            import math
             k = self.curve_param if self.curve_param > 0 else 9.0
             denom = math.log1p(k)
             p_log = math.log1p(k * p) / denom if denom != 0 else p
             return s0 + (s1 - s0) * p_log
+
+        elif self.schedule_type == 'sigmoid':
+            # Sigmoid-shaped interpolation:
+            # curve_param controls steepness: higher = steeper transition.
+            k = self.curve_param if self.curve_param > 0 else 9.0
+            x = 2 * p - 1  # Map [0,1] -> [-1,1] for symmetric sigmoid
+            sig = 1 / (1 + math.exp(-k * x))
+            # Normalize so p=0 → 0 and p=1 → 1 exactly
+            sig_norm = (sig - 1 / (1 + math.exp(k))) / (1 - 2 / (1 + math.exp(k)))
+            return s0 + (s1 - s0) * sig_norm
 
         else:
             raise ValueError(f"Unsupported stiffness schedule: {self.schedule_type}")
@@ -157,6 +162,7 @@ class TrainingConfig:
         folder_seed_start: int = None,
         folder_seed_end: int = None,
         growth_type: str = "constant",
+        curve_param: float = 9.0,
         ) -> None:
         def _fmt(v: int) -> str:
             """Formats an integer into a 'k' notation if large enough."""
@@ -164,7 +170,8 @@ class TrainingConfig:
                 return str(v)
             k = v / 1000
             return f"{int(k)}k" if v % 1000 == 0 else f"{k:.1f}k"
-        self.growth_type = growth_type  # ✅ Save it for folder naming
+        self.growth_type = growth_type
+        self.curve_param = float(curve_param)  # ✅ Save it for folder naming
         self.algorithm = "PPO"
         self.stiffness_start = stiffness_start
         self.stiffness_end = stiffness_end
@@ -235,6 +242,7 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
         max_episode_steps: int = 1_000,
         stiffness_schedule_type: str = 'constant',
         total_training_steps: int = 1_000_000,
+        curve_param: float = 9.0,
     ) -> None:
         # --- MujocoEnv setup ---
         self.action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
@@ -275,7 +283,8 @@ class LegEnvBase(mujoco_env.MujocoEnv, utils.EzPickle):
             schedule_type=stiffness_schedule_type,
             start=stiffness_start,
             end=stiffness_end,
-            total_epochs=self.total_epochs
+            total_epochs=self.total_epochs,
+            curve_param=curve_param,
         )
 
         # Apply and record the initial stiffness after history lists are created.
@@ -518,6 +527,8 @@ def train(config: TrainingConfig, seed: int) -> None:
         num_epochs=config.num_epochs,
         max_episode_steps=config.max_episode_steps,
         total_training_steps=config.total_timesteps,
+        curve_param=config.curve_param,
+
     )
     env.seed(seed)
     # ---------- log saves ----------

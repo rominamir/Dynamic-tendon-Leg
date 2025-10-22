@@ -153,6 +153,7 @@ def main() -> None:
         max_episode_steps=args.max_episode_steps,
         growth_type=schedule_type,  # normalized name: constant | linear | expo | log
         folder_seed_start=folder_seed_start,
+        curve_param=args.curve_param,
         folder_seed_end=folder_seed_end,
     )
 
