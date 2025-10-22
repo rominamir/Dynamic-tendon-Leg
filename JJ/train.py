@@ -15,6 +15,9 @@ Examples:
 
     # Logarithmic growth (front-loaded; curve_param controls early acceleration):
     python train.py --growth_type log --stiffness_start 5k --stiffness_end 50k --curve_param 9.0 --seed_start 100 --seed_end 100
+
+    # Sigmoid growth (S-shaped; curve_param controls steepness of mid-transition):
+    python train.py --growth_type sigmoid --stiffness_start 5k --stiffness_end 50k --curve_param 10.0 --seed_start 100 --seed_end 100
 """
 
 import argparse
@@ -66,12 +69,13 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         default="constant_20k",
         help=("Stiffness schedule type. "
-              "Supports: 'constant', 'constant_<val>[k]', 'linear', 'expo', 'log'. "
-              "Examples: constant_20k | constant | linear | expo | log")
+              "Supports: 'constant', 'constant_<val>[k]', 'linear', 'expo', 'log', 'sigmoid'. "
+              "Examples: constant_20k | constant | linear | expo | log | sigmoid")
     )
     p.add_argument("--lr_schedule_type", type=str, default="constant", help="Learning rate schedule type (reserved)")
     p.add_argument("--curve_param", type=float, default=9.0,
-                   help="Shape parameter for 'log' schedule (larger -> more front-loaded).")
+                   help=("Shape parameter for 'log' (larger -> more front-loaded) "
+                         "and for 'sigmoid' (larger -> steeper mid-transition)."))
     return p
 
 
@@ -89,7 +93,7 @@ def main() -> None:
     # Parse growth_type
     #   - constant_<val>[k]  -> constant schedule with parsed value
     #   - constant           -> constant schedule using stiffness_start
-    #   - linear/expo/log    -> dynamic schedules, require distinct start/end
+    #   - linear/expo/log/sigmoid -> dynamic schedules, require distinct start/end
     # ----------------------------------------------
     schedule_type = args.growth_type.lower().strip()
 
@@ -112,7 +116,7 @@ def main() -> None:
         args.stiffness_end = args.stiffness_start
         print(f"[INFO] Using constant stiffness: {args.stiffness_start}")
 
-    elif schedule_type in {"linear", "expo", "log"}:
+    elif schedule_type in {"linear", "expo", "log", "sigmoid"}:
         print(f"[INFO] Using dynamic stiffness schedule: {schedule_type}")
         if args.stiffness_end == args.stiffness_start:
             # Provide a helpful automatic nudge
@@ -128,7 +132,7 @@ def main() -> None:
 
     else:
         raise ValueError(f"Unsupported growth_type: {args.growth_type}. "
-                         f"Use 'constant', 'constant_<val>[k]', 'linear', 'expo', or 'log'.")
+                         f"Use 'constant', 'constant_<val>[k]', 'linear', 'expo', 'log', or 'sigmoid'.")
 
     # ----------------------------------------------
     # Use global range for folder naming consistency
@@ -151,15 +155,13 @@ def main() -> None:
         seed_end=args.seed_end,
         run_date=run_date,
         max_episode_steps=args.max_episode_steps,
-        growth_type=schedule_type,  # normalized name: constant | linear | expo | log
+        growth_type=schedule_type,  # normalized name: constant | linear | expo | log | sigmoid
         folder_seed_start=folder_seed_start,
         curve_param=args.curve_param,
         folder_seed_end=folder_seed_end,
     )
 
-    # If using 'log', pass curve_param via environment var (or extend TrainingConfig if you prefer)
-    # Option A (minimal change): env reads os.environ.get("LOG_CURVE_PARAM", "9.0")
-    # Option B (recommended): extend TrainingConfig/LegEnvBase to accept curve_param explicitly.
+    # Still export for backward-compat env-based readers (safe no-op if unused)
     os.environ["LOG_CURVE_PARAM"] = str(args.curve_param)
 
     # ----------------------------------------------
@@ -167,7 +169,8 @@ def main() -> None:
     # ----------------------------------------------
     for seed in range(args.seed_start, args.seed_end + 1):
         print(f"🚀 Training | Seed={seed} | schedule={schedule_type} | "
-              f"Stiffness={args.stiffness_start}->{args.stiffness_end} | LR={args.lr:.0e}")
+              f"Stiffness={args.stiffness_start}->{args.stiffness_end} | LR={args.lr:.0e} | "
+              f"curve_param={args.curve_param}")
         try:
             train(cfg, seed)
             print(f"✅ Finished training for Seed {seed}")
